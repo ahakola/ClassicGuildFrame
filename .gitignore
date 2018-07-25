@@ -1,2 +1,6 @@
 # All the WIP .rar-files
 *.rar
+
+# All images
+*.png
+*.jpg
