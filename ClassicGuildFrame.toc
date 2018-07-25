@@ -1,0 +1,20 @@
+## Interface: 80000
+## Author: Sanex (Arathor EU)
+## Title: Classic Guild Frame
+## Version: 1.0
+## LoadWith: Blizzard_Communities
+## Notes: Restoring the old GuildUI for BfA with the Chat from the new CommunitiesUI
+## RequiredDeps:
+
+GuildUI.xml
+GuildRoster.xml
+GuildNews.xml
+GuildRewards.xml
+GuildInfo.xml
+
+ClassicList.xml
+ClassicChatFrame.xml
+ClassicStreams.xml
+ClassicFrame.xml
+
+Core.lua

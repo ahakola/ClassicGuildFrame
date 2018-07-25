@@ -1,0 +1,60 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+	<Script file="ClassicFrame.lua"/>
+	
+	<Frame name="ClassicFrame" parent="ClassicGuildFrame" hidden="true" mixin="ClassicFrameMixin">
+		<!--<Size x="814" y="426"/>-->
+		<Size x="338" y="424"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Frames>
+			<Frame parentKey="StreamDropDownMenu" inherits="StreamDropDownMenuTemplate">
+				<Size x="40" y="28"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="188" y="-32"/>
+				</Anchors>
+			</Frame>
+			<Frame parentKey="ClassicListDropDownMenu" inherits="ClassicListDropDownMenuTemplate">
+				<Size x="40" y="28"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="-10" y="-28"/>
+				</Anchors>
+			</Frame>
+			<Frame parentKey="VoiceChatHeadset" inherits="VoiceChatHeadsetTemplate">
+				<Size x="30" y="30"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-15" y="-26"/>
+				</Anchors>
+			</Frame>
+			<Frame parentKey="Chat" inherits="ClassicChatTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.ClassicList" relativePoint="TOPRIGHT" x="31" y="-46"/>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent.MemberList" relativePoint="BOTTOMLEFT" x="-22" y="28"/>
+				</Anchors>
+			</Frame>
+			<EditBox parentKey="ChatEditBox" frameLevel="1200" inherits="ClassicChatEditBoxTemplate">
+				<Size x="0" y="32"/>
+				<!-- Anchored in code -->
+			</EditBox>
+			<Frame parentKey="EditStreamDialog" frameStrata="DIALOG" inherits="ClassicEditStreamDialogTemplate" hidden="true">
+				<Size x="320" y="260"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="UIParent" x="0" y="-142"/>
+				</Anchors>
+			</Frame>
+			<Frame parentKey="NotificationSettingsDialog" frameStrata="DIALOG" inherits="ClassicNotificationSettingsDialogTemplate" hidden="true">
+				<Size x="638" y="508"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="UIParent" x="0" y="-142"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnShow method="OnShow"/>
+			<OnEvent method="OnEvent"/>
+			<OnHide method="OnHide"/>
+		</Scripts>
+	</Frame>
+</Ui>
