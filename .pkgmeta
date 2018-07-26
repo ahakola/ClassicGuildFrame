@@ -1,0 +1,7 @@
+package-as: ClassicGuildFrame
+
+license-output: LICENSE.txt
+
+ignore:
+    - LICENSE.md
+    - README.md
