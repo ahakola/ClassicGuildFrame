@@ -7,7 +7,7 @@ externals:
         url: https://repos.wowace.com/wow/libstub/trunk
         tag: latest
     LibUIDropDownMenu:
-        url: https://repos.wowace.com/wow/libuidropdownmenu/trunk
+        url: https://repos.wowace.com/wow/libuidropdownmenu/trunk/LibUIDropDownMenu
         tag: latest
 
 enable-nolib-creation: no
