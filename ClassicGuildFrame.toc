@@ -6,6 +6,9 @@
 ## Notes: Restoring the old GuildUI for BfA with the Chat from the new CommunitiesUI
 ## RequiredDeps:
 
+LibStub\LibStub.lua
+LibUIDropDownMenu\LibUIDropDownMenu.xml
+
 GuildUI.xml
 GuildRoster.xml
 GuildNews.xml

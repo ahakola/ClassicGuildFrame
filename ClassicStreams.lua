@@ -7,7 +7,7 @@ function ClassicStreamDropDownMenu_GetStreamName(clubId, stream)
 	else
 		streamName = stream.name;
 	end
-	
+
 	local r, g, b = Chat_GetCommunitiesChannelColor(clubId, streamId);
 	local color = CreateColor(r, g, b);
 	streamName = color:WrapTextInColorCode(streamName);
@@ -16,7 +16,7 @@ function ClassicStreamDropDownMenu_GetStreamName(clubId, stream)
 	if localID and localID ~= 0 then
 		streamName = streamName.." "..GRAY_FONT_COLOR:WrapTextInColorCode(COMMUNITIES_STREAM0_CHAT_SHORTCUT_FORMAT:format(localID));
 	end
-	
+
 	return streamName;
 end
 
@@ -25,18 +25,18 @@ function ClassicStreamDropDownMenu_Initialize(self)
 	if not clubId then
 		return;
 	end
-	
+
 	local streams = C_Club.GetStreams(clubId);
 	CommunitiesUtil.SortStreams(streams);
-	
+
 	local streamToNotificationSetting = CommunitiesUtil.GetStreamNotificationSettingsLookup(clubId);
 	local canEditStream = self:GetClassicFrame():GetPrivilegesForClub(clubId).canDestroyStream;
-	local info = UIDropDownMenu_CreateInfo();
+	local info = L_UIDropDownMenu_CreateInfo();
 	info.minWidth = 170;
 	for i, stream in ipairs(streams) do
 		local streamId = stream.streamId;
 		info.text = ClassicStreamDropDownMenu_GetStreamName(clubId, stream);
-		
+
 		-- TODO:: Support mention-based notifications once we have support for mentions.
 		if streamToNotificationSetting[streamId] == Enum.ClubStreamNotificationFilter.All and
 			CommunitiesUtil.DoesCommunityStreamHaveUnreadMessages(clubId, streamId) then
@@ -45,17 +45,17 @@ function ClassicStreamDropDownMenu_Initialize(self)
 
 		info.mouseOverIcon = canEditStream and stream.streamType == Enum.ClubStreamType.Other and "Interface\\WorldMap\\GEAR_64GREY" or nil;
 		info.value = streamId;
-		info.checked = streamId == UIDropDownMenu_GetSelectedValue(self);
+		info.checked = streamId == L_UIDropDownMenu_GetSelectedValue(self);
 		info.func = function(button)
 			local gearIcon = button.Icon;
 			if button.mouseOverIcon ~= nil and gearIcon:IsMouseOver() then
 				self:GetClassicFrame():ShowEditStreamDialog(clubId, streamId);
 			else
 				local communitiesFrame = self:GetClassicFrame();
-				communitiesFrame:SelectStream(communitiesFrame:GetSelectedClubId(), button.value) 
+				communitiesFrame:SelectStream(communitiesFrame:GetSelectedClubId(), button.value)
 			end
 		end
-		UIDropDownMenu_AddButton(info);
+		L_UIDropDownMenu_AddButton(info);
 	end
 
 	info.mouseOverIcon = nil;
@@ -67,7 +67,7 @@ function ClassicStreamDropDownMenu_Initialize(self)
 		info.func = function(button)
 			self:GetClassicFrame():ShowCreateChannelDialog();
 		end
-		UIDropDownMenu_AddButton(info);
+		L_UIDropDownMenu_AddButton(info);
 	end
 
 	info.customCheckIconAtlas = nil;
@@ -78,13 +78,13 @@ function ClassicStreamDropDownMenu_Initialize(self)
 	info.func = function(button)
 		self:GetClassicFrame():ShowNotificationSettingsDialog(clubId);
 	end
-	UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 end
 
 ClassicStreamDropDownMixin = {}
 
 function ClassicStreamDropDownMixin:OnLoad()
-	UIDropDownMenu_SetWidth(self, 115);
+	L_UIDropDownMenu_SetWidth(self, 115);
 	self.Text:SetJustifyH("LEFT");
 end
 
@@ -335,7 +335,7 @@ function ClassicAddToChatMixin:OnClick()
 	if clubId and streamId then
 		self:SetClubId(clubId);
 		self:SetStreamId(streamId);
-		ToggleDropDownMenu(nil, nil, self.DropDown, self, 0, 0);
+		L_ToggleDropDownMenu(nil, nil, self.DropDown, self, 0, 0);
 	end
 end
 
@@ -346,17 +346,17 @@ function ClassicAddToChatDropDown_Initialize(self, level)
 		return;
 	end
 
-	local info = UIDropDownMenu_CreateInfo();
+	local info = L_UIDropDownMenu_CreateInfo();
 	info.text = COMMUNITIES_ADD_TO_CHAT_DROP_DOWN_TITLE;
 	info.isTitle = true;
 	info.notCheckable = true;
-	UIDropDownMenu_AddButton(info, level);
+	L_UIDropDownMenu_AddButton(info, level);
 
 	local channelName = Chat_GetCommunitiesChannelName(clubId, streamId);
 	for i = 1, FCF_GetNumActiveChatFrames() do
 		local chatWindow = _G["ChatFrame"..i];
 		if chatWindow ~= COMBATLOG then
-			local info = UIDropDownMenu_CreateInfo();
+			local info = L_UIDropDownMenu_CreateInfo();
 			local chatTab = _G["ChatFrame"..i.."Tab"];
 			info.text = chatTab.Text:GetText();
 			info.value = i;
@@ -372,13 +372,13 @@ function ClassicAddToChatDropDown_Initialize(self, level)
 
 			info.isNotRadio = true;
 			info.checked = ChatFrame_ContainsChannel(chatWindow, channelName);
-			UIDropDownMenu_AddButton(info, level);
+			L_UIDropDownMenu_AddButton(info, level);
 		end
 	end
 
 	local canCreateChatWindow = FCF_GetNumActiveChatFrames() ~= NUM_CHAT_WINDOWS;
 	if canCreateChatWindow then
-		local info = UIDropDownMenu_CreateInfo();
+		local info = L_UIDropDownMenu_CreateInfo();
 		info.text = COMMUNITIES_ADD_TO_CHAT_DROP_DOWN_NEW_CHAT_WINDOW;
 		info.func = function(button)
 		local clubInfo = C_Club.GetClubInfo(clubId);
@@ -398,12 +398,12 @@ function ClassicAddToChatDropDown_Initialize(self, level)
 
     info.isNotRadio = true;
     info.notCheckable = true;
-    UIDropDownMenu_AddButton(info, level);
+    L_UIDropDownMenu_AddButton(info, level);
 end
 
-UIDropDownMenu_AddSeparator();
+L_UIDropDownMenu_AddSeparator();
 
-local info = UIDropDownMenu_CreateInfo();
+local info = L_UIDropDownMenu_CreateInfo();
 info.text = COMMUNITIES_ADD_TO_CHAT_DROP_DOWN_CHAT_SETTINGS;
 info.func = function()
 local CURRENT_CHAT_FRAME_ID = SELECTED_CHAT_FRAME:GetID();
@@ -413,11 +413,11 @@ end;
 
 info.isNotRadio = true;
 info.notCheckable = true;
-UIDropDownMenu_AddButton(info, level);
+L_UIDropDownMenu_AddButton(info, level);
 end
 
 function ClassicAddToChatDropDown_OnLoad(self)
-	UIDropDownMenu_Initialize(self, ClassicAddToChatDropDown_Initialize, "MENU");
+	L_UIDropDownMenu_Initialize(self, ClassicAddToChatDropDown_Initialize, "MENU");
 end
 
 function ClassicAddToChatMixin:GetClassicFrame()

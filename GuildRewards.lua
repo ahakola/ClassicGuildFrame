@@ -16,7 +16,7 @@ end
 
 function ClassicGuildRewardsFrame_OnHide(self)
 	if ( ClassicGuildRewardsDropDown.rewardIndex ) then
-		CloseDropDownMenus();
+		L_CloseDropDownMenus();
 	end
 end
 
@@ -88,15 +88,15 @@ function ClassicGuildRewards_Update()
 	local totalHeight = numRewards * (GUILD_REWARDS_BUTTON_HEIGHT + GUILD_REWARDS_BUTTON_OFFSET);
 	local displayedHeight = numButtons * (GUILD_REWARDS_BUTTON_HEIGHT + GUILD_REWARDS_BUTTON_OFFSET);
 	HybridScrollFrame_Update(scrollFrame, totalHeight, displayedHeight);
-	
+
 	-- hide dropdown menu
 	if ( ClassicGuildRewardsDropDown.rewardIndex ) then
-		CloseDropDownMenus();
+		L_CloseDropDownMenus();
 	end
 	-- update tooltip
 	if ( ClassicGuildRewardsFrame.activeButton ) then
 		ClassicGuildRewardsButton_OnEnter(ClassicGuildRewardsFrame.activeButton);
-	end	
+	end
 end
 
 function ClassicGuildRewardsButton_OnEnter(self)
@@ -135,45 +135,45 @@ function ClassicGuildRewardsButton_OnClick(self, button)
 	elseif ( button == "RightButton" ) then
 		local dropDown = ClassicGuildRewardsDropDown;
 		if ( dropDown.rewardIndex ~= self.index ) then
-			CloseDropDownMenus();
+			L_CloseDropDownMenus();
 		end
 		dropDown.rewardIndex = self.index;
 		dropDown.onHide = ClassicGuildRewardsDropDown_OnHide;
-		ToggleDropDownMenu(1, nil, dropDown, "cursor", 3, -3);
+		L_ToggleDropDownMenu(1, nil, dropDown, "cursor", 3, -3);
 	end
 end
 
 --****** Dropdown **************************************************************
 
 function ClassicGuildRewardsDropDown_OnLoad(self)
-	UIDropDownMenu_Initialize(self, ClassicGuildRewardsDropDown_Initialize, "MENU");
+	L_UIDropDownMenu_Initialize(self, ClassicGuildRewardsDropDown_Initialize, "MENU");
 end
 
 function ClassicGuildRewardsDropDown_Initialize(self)
 	if ( not self.rewardIndex ) then
 		return;
 	end
-	
+
 	local achievementID, itemID, itemName, iconTexture, repLevel, moneyCost = GetGuildRewardInfo(self.rewardIndex);
 
-	local info = UIDropDownMenu_CreateInfo();
+	local info = L_UIDropDownMenu_CreateInfo();
 	info.notCheckable = 1;
 	info.isTitle = 1;
 	info.text = itemName;
-	UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
-	info = UIDropDownMenu_CreateInfo();
+	L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+	info = L_UIDropDownMenu_CreateInfo();
 	info.notCheckable = 1;
 
 	info.func = ClassicGuildFrame_LinkItem;
 	info.text = GUILD_NEWS_LINK_ITEM;
 	info.arg1 = itemID;
-	UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
-		
+	L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+
 	if ( achievementID and achievementID > 0 ) then
 		info.func = ClassicGuildFrame_OpenAchievement;
 		info.text = GUILD_NEWS_VIEW_ACHIEVEMENT;
 		info.arg1 = achievementID;
-		UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+		L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
 	end
 end
 

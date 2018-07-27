@@ -2,6 +2,17 @@ package-as: ClassicGuildFrame
 
 license-output: LICENSE.txt
 
+externals:
+    LibStub:
+        url: https://repos.wowace.com/wow/libstub/trunk
+        tag: latest
+    LibUIDropDownMenu:
+        url: https://repos.wowace.com/wow/libuidropdownmenu/trunk
+        tag: latest
+
+enable-nolib-creation: no
+
 ignore:
+    - LibStub/tests
     - LICENSE.md
     - README.md

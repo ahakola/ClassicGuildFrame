@@ -16,7 +16,7 @@ function ClassicGuildInfoFrame_OnLoad(self)
 	self:RegisterEvent("LF_GUILD_RECRUITS_UPDATED");
 	self:RegisterEvent("LF_GUILD_RECRUIT_LIST_CHANGED");
 	self:RegisterEvent("GUILD_CHALLENGE_UPDATED");
-	
+
 	RequestGuildRecruitmentSettings();
 	RequestGuildChallengeInfo();
 end
@@ -96,11 +96,11 @@ function ClassicGuildInfoFrameInfo_OnLoad(self)
 	ClassicGuildInfoEditMOTDButton:SetWidth(fontString:GetWidth() + 4);
 	fontString = ClassicGuildInfoEditDetailsButton:GetFontString();
 	ClassicGuildInfoEditDetailsButton:SetHeight(fontString:GetHeight() + 4);
-	ClassicGuildInfoEditDetailsButton:SetWidth(fontString:GetWidth() + 4);	
+	ClassicGuildInfoEditDetailsButton:SetWidth(fontString:GetWidth() + 4);
 end
 
 function ClassicGuildInfoFrameInfo_OnShow(self)
-	ClassicGuildInfoFrame_UpdatePermissions();	
+	ClassicGuildInfoFrame_UpdatePermissions();
 	ClassicGuildInfoFrame_UpdateText();
 end
 
@@ -149,7 +149,7 @@ function ClassicGuildInfoFrame_UpdatePermissions()
 				ClassicGuildInfoFrame_Update();
 			end
 		end
-	end	
+	end
 end
 
 function ClassicGuildInfoFrame_UpdateText(infoText)
@@ -194,7 +194,7 @@ function ClassicGuildInfoFrameRecruitment_OnLoad(self)
 	ClassicGuildRecruitmentLevelFrameText:SetText(GUILD_RECRUITMENT_LEVEL);
 	ClassicGuildRecruitmentLevelFrame:SetHeight(43);
 	ClassicGuildRecruitmentCommentFrame:SetHeight(72);
-	
+
 	-- defaults until data is retrieved
 	ClassicGuildRecruitmentLevelAnyButton:SetChecked(true);
 	ClassicGuildRecruitmentListGuildButton:Disable();
@@ -214,7 +214,7 @@ function ClassicGuildRecruitmentLevelButton_OnClick(index, userClick)
 	if ( userClick ) then
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 		SetGuildRecruitmentSettings(param, true);
-	end	
+	end
 end
 
 function ClassicGuildRecruitmentRoleButton_OnClick(self)
@@ -286,8 +286,8 @@ end
 function ClassicGuildInfoFrameApplicants_OnLoad(self)
 	ClassicGuildInfoFrameApplicantsContainer.update = ClassicGuildInfoFrameApplicants_Update;
 	HybridScrollFrame_CreateButtons(ClassicGuildInfoFrameApplicantsContainer, "ClassicGuildRecruitmentApplicantTemplate", 0, 0);
-	
-	ClassicGuildInfoFrameApplicantsContainerScrollBar.Show = 
+
+	ClassicGuildInfoFrameApplicantsContainerScrollBar.Show =
 		function (self)
 			ClassicGuildInfoFrameApplicantsContainer:SetWidth(304);
 			for _, button in next, ClassicGuildInfoFrameApplicantsContainer.buttons do
@@ -296,7 +296,7 @@ function ClassicGuildInfoFrameApplicants_OnLoad(self)
 			end
 			getmetatable(self).__index.Show(self);
 		end
-	ClassicGuildInfoFrameApplicantsContainerScrollBar.Hide = 
+	ClassicGuildInfoFrameApplicantsContainerScrollBar.Hide =
 		function (self)
 			ClassicGuildInfoFrameApplicantsContainer:SetWidth(320);
 			for _, button in next, ClassicGuildInfoFrameApplicantsContainer.buttons do
@@ -326,7 +326,7 @@ function ClassicGuildInfoFrameApplicants_Update()
 		ClassicGuildInfoFrameTab3:SetFormattedText(GUILDINFOTAB_APPLICANTS, numApplicants);
 	end
 	PanelTemplates_TabResize(ClassicGuildInfoFrameTab3, 0);
-	
+
 	for i = 1, numButtons do
 		button = buttons[i];
 		index = offset + i;
@@ -371,7 +371,7 @@ function ClassicGuildInfoFrameApplicants_Update()
 			else
 				button.selectedTex:Hide();
 			end
-			
+
 			button:SetHeight(buttonHeight);
 			button:Show();
 			button.index = index;
@@ -379,18 +379,18 @@ function ClassicGuildInfoFrameApplicants_Update()
 			button:Hide();
 		end
 	end
-	
+
 	if ( not selection ) then
 		HybridScrollFrame_CollapseButton(scrollFrame);
 	end
-	
+
 	local totalHeight = numApplicants * GUILD_BUTTON_HEIGHT;
 	if ( scrollFrame.largeButtonHeight ) then
 		totalHeight = totalHeight + (scrollFrame.largeButtonHeight - GUILD_BUTTON_HEIGHT);
 	end
 	local displayedHeight = numApplicants * GUILD_BUTTON_HEIGHT;
 	HybridScrollFrame_Update(scrollFrame, totalHeight, displayedHeight);
-	
+
 	if ( selection and selection > 0 ) then
 		ClassicGuildRecruitmentInviteButton:Enable();
 		ClassicGuildRecruitmentDeclineButton:Enable();
@@ -418,10 +418,10 @@ function ClassicGuildRecruitmentApplicant_OnClick(self, button)
 	elseif ( button == "RightButton" ) then
 		local dropDown = ClassicGuildRecruitmentDropDown;
 		if ( dropDown.index ~= self.index ) then
-			CloseDropDownMenus();
+			L_CloseDropDownMenus();
 		end
 		dropDown.index = self.index;
-		ToggleDropDownMenu(1, nil, dropDown, "cursor", 1, -1);
+		L_ToggleDropDownMenu(1, nil, dropDown, "cursor", 1, -1);
 	end
 end
 
@@ -435,52 +435,52 @@ function ClassicGuildRecruitmentApplicant_ShowTooltip(self)
 	if ( bDungeon ) then buf = buf.."\n"..QUEST_DASH..GUILD_INTEREST_DUNGEON; end
 	if ( bRaid ) then buf = buf.."\n"..QUEST_DASH..GUILD_INTEREST_RAID; end
 	if ( bPvP ) then buf = buf.."\n"..QUEST_DASH..GUILD_INTEREST_PVP; end
-	if ( bRP ) then buf = buf.."\n"..QUEST_DASH..GUILD_INTEREST_RP; end	
+	if ( bRP ) then buf = buf.."\n"..QUEST_DASH..GUILD_INTEREST_RP; end
 	GameTooltip:AddLine(GUILD_INTEREST..HIGHLIGHT_FONT_COLOR_CODE..buf..FONT_COLOR_CODE_CLOSE);
 	-- availability
 	buf = "";
 	if ( bWeekdays ) then buf = buf.."\n"..QUEST_DASH..GUILD_AVAILABILITY_WEEKDAYS; end
 	if ( bWeekends ) then buf = buf.."\n"..QUEST_DASH..GUILD_AVAILABILITY_WEEKENDS; end
 	GameTooltip:AddLine(GUILD_AVAILABILITY..HIGHLIGHT_FONT_COLOR_CODE..buf..FONT_COLOR_CODE_CLOSE);
-	
+
 	GameTooltip:Show();
 end
 
 function ClassicGuildRecruitmentDropDown_OnLoad(self)
-	UIDropDownMenu_Initialize(self, ClassicGuildRecruitmentDropDown_Initialize, "MENU");
+	L_UIDropDownMenu_Initialize(self, ClassicGuildRecruitmentDropDown_Initialize, "MENU");
 end
 
 function ClassicGuildRecruitmentDropDown_Initialize(self)
-	local info = UIDropDownMenu_CreateInfo();
+	local info = L_UIDropDownMenu_CreateInfo();
 	local name = GetGuildApplicantInfo(ClassicGuildRecruitmentDropDown.index) or UNKNOWN;
 	info.text = name;
 	info.isTitle = 1;
 	info.notCheckable = 1;
-	UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+	L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
 
-	info = UIDropDownMenu_CreateInfo();
+	info = L_UIDropDownMenu_CreateInfo();
 	info.notCheckable = 1;
 	info.func = ClassicGuildRecruitmentDropDown_OnClick;
-	
+
 	info.text = INVITE;
 	info.arg1 = "invite";
-	UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
-	
+	L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+
 	info.text = WHISPER;
 	info.arg1 = "whisper";
-	UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+	L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
 
 	info.text = ADD_FRIEND;
 	info.arg1 = "addfriend";
 	if ( GetFriendInfo(name) ) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
-	
+	L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+
 	info.text = DECLINE;
 	info.arg1 = "decline";
 	info.disabled = nil;
-	UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+	L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
 end
 
 function ClassicGuildRecruitmentDropDown_OnClick(button, action)

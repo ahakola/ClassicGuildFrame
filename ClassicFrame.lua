@@ -40,7 +40,7 @@ function ClassicFrameMixin:OnLoad()
 	ClassicGuildFrame_RegisterPanel(self);
 	CallbackRegistryBaseMixin.OnLoad(self);
 
-	UIDropDownMenu_Initialize(self.StreamDropDownMenu, ClassicStreamDropDownMenu_Initialize);
+	L_UIDropDownMenu_Initialize(self.StreamDropDownMenu, ClassicStreamDropDownMenu_Initialize);
 
 	self.selectedStreamForClub = {};
 	self.privilegesForClub = {};
@@ -190,7 +190,7 @@ function ClassicFrameMixin:CloseStaticPopups() -- ???
 end
 
 function ClassicFrameMixin:CloseActiveDialogs(dialogBeingShown) -- ???
-	CloseDropDownMenus();
+	L_CloseDropDownMenus();
 
 	self:CloseStaticPopups();
 	
@@ -375,9 +375,9 @@ end
 function ClassicFrameMixin:UpdateStreamDropDown()
 	local clubId = self:GetSelectedClubId();
 	local selectedStream = self:GetSelectedStreamForClub(clubId);
-	UIDropDownMenu_SetSelectedValue(self.StreamDropDownMenu, selectedStream and selectedStream.streamId or nil, true);
+	L_UIDropDownMenu_SetSelectedValue(self.StreamDropDownMenu, selectedStream and selectedStream.streamId or nil, true);
 	local streamName = selectedStream and ClassicStreamDropDownMenu_GetStreamName(clubId, selectedStream) or "";
-	UIDropDownMenu_SetText(self.StreamDropDownMenu, streamName);
+	L_UIDropDownMenu_SetText(self.StreamDropDownMenu, streamName);
 	self.StreamDropDownMenu:UpdateUnreadNotification();
 end
 

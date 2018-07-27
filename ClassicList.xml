@@ -2,7 +2,7 @@
 ..\..\FrameXML\UI.xsd">
 	<Script file="ClassicList.lua"/>
 
-	<Frame name="ClassicListDropDownMenuTemplate" inherits="UIDropDownMenuTemplate" mixin="ClassicListDropDownMenuMixin" virtual="true">
+	<Frame name="ClassicListDropDownMenuTemplate" inherits="L_UIDropDownMenuTemplate" mixin="ClassicListDropDownMenuMixin" virtual="true">
 		<Size x="40" y="28"/>
 		<Frames>
 			<Frame parentKey="NotificationOverlay" frameLevel="100" setAllPoints="true" hidden="true">

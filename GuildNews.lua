@@ -28,7 +28,7 @@ function ClassicGuildNewsFrame_OnLoad(self)
 	ClassicGuildNewsSetFiltersButton:SetWidth(fontString:GetWidth() + 4);
 	ClassicGuildNewsContainer.update = ClassicGuildNews_Update;
 	HybridScrollFrame_CreateButtons(ClassicGuildNewsContainer, "ClassicGuildNewsButtonTemplate", 0, 0);
-	
+
 	if ( GetGuildFactionGroup() == 0 ) then  -- horde
 		GUILD_EVENT_TEXTURES[CALENDAR_EVENTTYPE_PVP] = "Interface\\Calendar\\UI-Calendar-Event-PVP01";
 	else  -- alliance
@@ -42,7 +42,7 @@ end
 
 function ClassicGuildNewsFrame_OnHide(self)
 	if ( ClassicGuildNewsDropDown.newsIndex ) then
-		CloseDropDownMenus();
+		L_CloseDropDownMenus();
 	end
 end
 
@@ -63,13 +63,13 @@ function ClassicGuildNews_Update()
 		ClassicGuildNewsContainer:SetPoint("TOPLEFT", ClassicGuildNewsFrameHeader, "BOTTOMLEFT", 0, 0);
 		ClassicGuildNewsContainer:SetHeight(287);
 	end
-	
+
 	local motd = GetGuildRosterMOTD();
 	local scrollFrame = ClassicGuildNewsContainer;
-	local haveMOTD = motd ~= "" and 1 or 0;	
+	local haveMOTD = motd ~= "" and 1 or 0;
 	local buttons = scrollFrame.buttons;
 	local button, index;
-	
+
 	local numEvents = math.min(7, C_Calendar.GetNumGuildEvents());
 	local numNews = GetNumGuildNews();
 	local offset = HybridScrollFrame_GetOffset(scrollFrame);
@@ -92,17 +92,17 @@ function ClassicGuildNews_Update()
 			button:Hide();
 		end
 	end
-	
+
 	-- update tooltip
 	if ( ClassicGuildNewsFrame.activeButton ) then
 		ClassicGuildNewsButton_OnEnter(ClassicGuildNewsFrame.activeButton);
 	end
-	
+
 	-- hide dropdown menu
 	if ( ClassicGuildNewsDropDown.newsIndex ) then
-		CloseDropDownMenus();
+		L_CloseDropDownMenus();
 	end
-	
+
 	if ( numNews == 0 and haveMOTD == 0 and numEvents == 0 ) then
 		ClassicGuildNewsFrameNoNews:Show();
 	else
@@ -163,7 +163,7 @@ function ClassicGuildNewsButton_SetEvent( button, event_id )
 	local texture = info.texture;
 	local displayTime = GameTime_GetFormattedTime(hour, minute, true);
 	local displayDay;
-	
+
 	if ( today["day"] == day and today["month"] == month ) then
 		displayDay = NORMAL_FONT_COLOR_CODE..GUILD_EVENT_TODAY..FONT_COLOR_CODE_CLOSE;
 	else
@@ -181,9 +181,9 @@ function ClassicGuildNewsButton_SetEvent( button, event_id )
 		end
 	end
 	ClassicGuildNewsButton_SetText(button, HIGHLIGHT_FONT_COLOR, GUILD_EVENT_FORMAT, displayDay, displayTime, title);
-	
+
 	button.text:SetPoint("LEFT", 24, 0);
-	ClassicGuildNewsButton_SetIcon( button, texture);	
+	ClassicGuildNewsButton_SetIcon( button, texture);
 	button.index = event_id;
 	button.newsType = NEWS_GUILD_EVENT;
 
@@ -229,7 +229,7 @@ function ClassicGuildNewsButton_SetNews( button, news_id )
 				text1 = text2;	-- only using achievement name
 			end
 		end
-		
+
 		if ( newsType ) then
 			ClassicGuildNewsButton_SetText( button, HIGHLIGHT_FONT_COLOR, _G["GUILD_NEWS_FORMAT"..newsType], text1, text2);
 		end
@@ -276,7 +276,7 @@ function ClassicGuildNewsButton_OnEnter(self)
 		if ( leftCriteria ) then
 			if ( firstCriteria ) then
 				GameTooltip:AddLine(" ");
-			end	
+			end
 			GameTooltip:AddLine(leftCriteria, 0.8, 0.8, 0.8);
 		end
 		GameTooltip:Show();
@@ -316,11 +316,11 @@ function ClassicGuildNewsButton_OnClick(self, button)
 	if ( button == "RightButton" ) then
 		local dropDown = ClassicGuildNewsDropDown;
 		if ( dropDown.newsIndex ~= self.index ) then
-			CloseDropDownMenus();
+			L_CloseDropDownMenus();
 		end
 		dropDown.newsIndex = self.index;
 		dropDown.onHide = ClassicGuildNewsDropDown_OnHide;
-		ToggleDropDownMenu(1, nil, dropDown, "cursor", 3, -3);
+		L_ToggleDropDownMenu(1, nil, dropDown, "cursor", 3, -3);
 	end
 end
 
@@ -333,21 +333,21 @@ end
 --****** Dropdown **************************************************************
 
 function ClassicGuildNewsDropDown_OnLoad(self)
-	UIDropDownMenu_Initialize(self, ClassicGuildNewsDropDown_Initialize, "MENU");
+	L_UIDropDownMenu_Initialize(self, ClassicGuildNewsDropDown_Initialize, "MENU");
 end
 
 function ClassicGuildNewsDropDown_Initialize(self)
 	if ( not self.newsIndex ) then
 		return;
 	end
-	
+
 	local isSticky, isHeader, newsType, text1, text2, id, data, data2, weekday, day, month, year = GetGuildNewsInfo(self.newsIndex);
 	-- we don't have any options for these combinations
 	if ( ( newsType == NEWS_DUNGEON_ENCOUNTER or newsType == NEWS_GUILD_LEVEL or newsType == NEWS_GUILD_CREATE ) and not CanEditMOTD() ) then
 		return;
 	end
 
-	local info = UIDropDownMenu_CreateInfo();
+	local info = L_UIDropDownMenu_CreateInfo();
 	info.notCheckable = 1;
 	info.isTitle = 1;
 	if ( newsType == NEWS_GUILD_CREATE ) then
@@ -355,21 +355,21 @@ function ClassicGuildNewsDropDown_Initialize(self)
 	else
 		info.text = text2;
 	end
-	UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);	
-	info = UIDropDownMenu_CreateInfo();
+	L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+	info = L_UIDropDownMenu_CreateInfo();
 	info.notCheckable = 1;
 
 	if ( newsType == NEWS_PLAYER_ACHIEVEMENT or newsType == NEWS_GUILD_ACHIEVEMENT ) then
 		info.func = ClassicGuildFrame_OpenAchievement;
 		info.text = GUILD_NEWS_VIEW_ACHIEVEMENT;
-		info.arg1 = id;	
-		UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+		info.arg1 = id;
+		L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
 	elseif ( newsType == NEWS_ITEM_LOOTED or newsType == NEWS_ITEM_CRAFTED or newsType == NEWS_ITEM_PURCHASED ) then
 		info.func = ClassicGuildFrame_LinkItem;
 		info.text = GUILD_NEWS_LINK_ITEM;
 		info.arg1 = id;
 		info.arg2 = text2;	-- text2 has the hyperlink text
-		UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+		L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
 	end
 	if ( CanEditMOTD() ) then
 		info.arg1 = self.newsIndex;
@@ -381,7 +381,7 @@ function ClassicGuildNewsDropDown_Initialize(self)
 			info.arg2 = 1;
 		end
 		info.func = ClassicGuildNewsDropDown_SetSticky;
-		UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+		L_UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
 	end
 end
 

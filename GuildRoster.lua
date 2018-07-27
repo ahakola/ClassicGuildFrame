@@ -31,7 +31,7 @@ local GUILD_ROSTER_COLUMN_DATA = {
 	rank = { width = 76, text = RANK, stringJustify="LEFT" },
 	note = { width = 76, text = LABEL_NOTE, stringJustify="LEFT" },
 	online = { width = 76, text = LASTONLINE, stringJustify="LEFT" },
-	zone = { width = 136, text = ZONE, stringJustify="LEFT" },	
+	zone = { width = 136, text = ZONE, stringJustify="LEFT" },
 	bgrating = { width = 83, text = BG_RATING_ABBR, stringJustify="RIGHT" },
 	arenarating = { width = 83, text = ARENA_RATING, stringJustify="RIGHT" },
 	weeklyxp = { width = 136, text = GUILD_XP_WEEKLY, stringJustify="RIGHT", hasBar = true },
@@ -56,7 +56,7 @@ function ClassicGuildRosterFrame_OnLoad(self)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	ClassicGuildRoster_SetView(GetCVar("guildRosterView"));
 	SetGuildRosterSelection(0);
-	UIDropDownMenu_SetSelectedValue(ClassicGuildRosterViewDropdown, currentGuildView);
+	L_UIDropDownMenu_SetSelectedValue(ClassicGuildRosterViewDropdown, currentGuildView);
 	-- right-click dropdown
 	ClassicGuildMemberDropDown.displayMode = "MENU";
 
@@ -76,7 +76,7 @@ function ClassicGuildRosterFrame_OnEvent(self, event, ...)
 			local canRequestRosterUpdate = ...;
 			if ( canRequestRosterUpdate ) then
 				GuildRoster();
-			end		
+			end
 			ClassicGuildRoster_Update();
 		end
 	elseif ( event == "PLAYER_ENTERING_WORLD" ) then
@@ -135,14 +135,14 @@ function ClassicGuildRoster_Update()
 	local button, index, class;
 	local totalMembers, onlineMembers, onlineAndMobileMembers = GetNumGuildMembers();
 	local selectedGuildMember = GetGuildRosterSelection();
-	
+
 	if ( currentGuildView == "tradeskill" ) then
 		ClassicGuildRoster_UpdateTradeSkills();
 		return;
 	end
 
 	local guildName, guildRankName, guildRankIndex = GetGuildInfo("player");
-	local maxRankIndex = GuildControlGetNumRanks() - 1;	
+	local maxRankIndex = GuildControlGetNumRanks() - 1;
 	-- Get selected guild member info
 	local fullName, rank, rankIndex, level, class, zone, note, officernote, online, isAway, classFileName, achievementPoints, achievementRank, isMobile = GetGuildRosterInfo(selectedGuildMember);
 	ClassicGuildFrame.selectedName = fullName;
@@ -156,7 +156,7 @@ function ClassicGuildRoster_Update()
 				ClassicGuildMemberDetailName:SetText(MOBILE_AWAY_ICON..GuildFrame.selectedName);
 			else
 				ClassicGuildMemberDetailName:SetText(ChatFrame_GetMobileEmbeddedTexture(73/255, 177/255, 73/255)..GuildFrame.selectedName);
-			end			
+			end
 		else
 			ClassicGuildMemberDetailName:SetText(ClassicGuildFrame.selectedName);
 		end
@@ -191,12 +191,12 @@ function ClassicGuildRoster_Update()
 		if ( ( CanGuildPromote() and rankIndex > guildRankIndex + 1 ) or ( CanGuildDemote() and rankIndex < maxRankIndex and rankIndex > guildRankIndex ) ) then
 			ClassicGuildMemberDetailRankLabel:SetHeight(20);
 			ClassicGuildMemberRankDropdown:Show();
-			UIDropDownMenu_SetText(ClassicGuildMemberRankDropdown, rank);
+			L_UIDropDownMenu_SetText(ClassicGuildMemberRankDropdown, rank);
 		else
 			ClassicGuildMemberDetailRankLabel:SetHeight(0);
 			ClassicGuildMemberRankDropdown:Hide();
 		end
-		
+
 		-- Update officer note
 		if ( CanViewOfficerNote() ) then
 			if ( CanEditOfficerNote() ) then
@@ -235,7 +235,7 @@ function ClassicGuildRoster_Update()
 	else
 		ClassicGuildMemberDetailFrame:Hide();
 	end
-	
+
 --	local maxWeeklyXP, maxTotalXP = GetGuildRosterLargestContribution();
 	local maxAchievementsPoints = GetGuildRosterLargestAchievementPoints();
 	-- numVisible
@@ -244,10 +244,10 @@ function ClassicGuildRoster_Update()
 		visibleMembers = totalMembers;
 	end
 	for i = 1, numButtons do
-		button = buttons[i];		
+		button = buttons[i];
 		index = offset + i;
 		local fullName, rank, rankIndex, level, class, zone, note, officernote, online, isAway, classFileName, achievementPoints, achievementRank, isMobile, canSoR, repStanding = GetGuildRosterInfo(index);
-		
+
 		local onlineOrMobile = online or isMobile;
 
 		if ( fullName and index <= visibleMembers ) then
@@ -270,14 +270,14 @@ function ClassicGuildRoster_Update()
 				local zoneText = zone;
 				if(isMobile and not online) then zoneText = REMOTE_CHAT; end;
 				ClassicGuildRosterButton_SetStringText(button.string3, zoneText, onlineOrMobile)
-				
+
 			elseif ( currentGuildView == "guildStatus" ) then
 				ClassicGuildRosterButton_SetStringText(button.string1, displayedName, onlineOrMobile, classFileName)
 				ClassicGuildRosterButton_SetStringText(button.string2, rank, onlineOrMobile)
 				ClassicGuildRosterButton_SetStringText(button.string3, note, onlineOrMobile)
-				
+
 				if ( onlineOrMobile ) then
-					ClassicGuildRosterButton_SetStringText(button.string4, GUILD_ONLINE_LABEL, onlineOrMobile);					
+					ClassicGuildRosterButton_SetStringText(button.string4, GUILD_ONLINE_LABEL, onlineOrMobile);
 				else
 					ClassicGuildRosterButton_SetStringText(button.string4, ClassicGuildRoster_GetLastOnline(index), onlineOrMobile);
 				end
@@ -307,7 +307,7 @@ function ClassicGuildRoster_Update()
 					button.barTexture:SetWidth(totalXP / maxTotalXP * GUILD_ROSTER_BAR_MAX);
 					button.barTexture:Show();
 				end
-				ClassicGuildRosterButton_SetStringText(button.barLabel, "#"..totalRank, onlineOrMobile);			
+				ClassicGuildRosterButton_SetStringText(button.barLabel, "#"..totalRank, onlineOrMobile);
 --]]
 			elseif ( currentGuildView == "pve" ) then
 				ClassicGuildRosterButton_SetStringText(button.string1, level, onlineOrMobile);
@@ -381,7 +381,7 @@ function ClassicGuildRosterButton_OnClick(self, button)
 				ClassicGuildFrame.selectedGuildMember = self.guildIndex;
 				PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN);
 				ClassicGuildFramePopup_Show(ClassicGuildMemberDetailFrame);
-				CloseDropDownMenus();
+				L_CloseDropDownMenus();
 			end
 			ClassicGuildRoster_Update();
 		else
@@ -401,7 +401,7 @@ function ClassicGuildRoster_ShowMemberDropDown(name, online, isMobile, guid)
 	ClassicGuildMemberDropDown.isMobile = isMobile;
 	ClassicGuildMemberDropDown.initialize = initFunc;
 	ClassicGuildMemberDropDown.guid = guid; --Not included on tradeskill pane
-	ToggleDropDownMenu(1, nil, ClassicGuildMemberDropDown, "cursor");
+	L_ToggleDropDownMenu(1, nil, ClassicGuildMemberDropDown, "cursor");
 end
 
 function ClassicGuildMemberDropDown_Initialize()
@@ -419,7 +419,7 @@ function ClassicGuildRoster_UpdateTradeSkills()
 	local numButtons = #buttons;
 	local button, index, class;
 	local numTradeSkill = GetNumGuildTradeSkill();
-	
+
 	for i = 1, numButtons do
 		button = buttons[i];
 		index = offset + i;
@@ -501,7 +501,7 @@ function ClassicGuildRoster_UpdateTradeSkills()
 			button:Hide();
 		end
 	end
-	
+
 	local totalHeight = numTradeSkill * (GUILD_ROSTER_BUTTON_HEIGHT + GUILD_ROSTER_BUTTON_OFFSET);
 	local displayedHeight = numButtons * (GUILD_ROSTER_BUTTON_HEIGHT + GUILD_ROSTER_BUTTON_OFFSET);
 	HybridScrollFrame_Update(scrollFrame, totalHeight, displayedHeight);
@@ -527,7 +527,7 @@ function ClassicGuildRoster_SetView(view)
 	local stringsInfo = { };
 	local stringOffset = 0;
 	local haveIcon, haveBar;
-	
+
 	-- set up columns
 	for columnIndex = 1, GUILD_ROSTER_MAX_COLUMNS do
 		local columnButton = _G["ClassicGuildRosterColumnButton"..columnIndex];
@@ -545,7 +545,7 @@ function ClassicGuildRoster_SetView(view)
 			end
 			if ( columnData.hasIcon ) then
 				haveIcon = true;
-			else	
+			else
 				-- store string data for processing
 				columnData["stringOffset"] = stringOffset;
 				table.insert(stringsInfo, columnData);
@@ -555,8 +555,8 @@ function ClassicGuildRoster_SetView(view)
 		else
 			columnButton:Hide();
 		end
-	end	
-	
+	end
+
 	-- process the button strings
 	local buttons = ClassicGuildRosterContainer.buttons;
 	local button, fontString;
@@ -575,7 +575,7 @@ function ClassicGuildRoster_SetView(view)
 				fontString:Hide();
 			end
 		end
-		
+
 		if ( haveIcon ) then
 			button.icon:Show();
 		else
@@ -583,14 +583,14 @@ function ClassicGuildRoster_SetView(view)
 		end
 		if ( haveBar ) then
 			button.barLabel:Show();
-			-- button.barTexture:Show(); -- shown status determined in GuildRoster_Update 
+			-- button.barTexture:Show(); -- shown status determined in GuildRoster_Update
 		else
 			button.barLabel:Hide();
 			button.barTexture:Hide();
 		end
 		button.header:Hide();
 	end
-	
+
 	if ( view == "tradeskill" ) then
 		ClassicGuildRoster_RecipeQueryCheck();
 	end
@@ -598,31 +598,31 @@ function ClassicGuildRoster_SetView(view)
 end
 
 function ClassicGuildRosterViewDropdown_OnLoad(self)
-	UIDropDownMenu_Initialize(self, ClassicGuildRosterViewDropdown_Initialize);
-	UIDropDownMenu_SetWidth(ClassicGuildRosterViewDropdown, 150);
+	L_UIDropDownMenu_Initialize(self, ClassicGuildRosterViewDropdown_Initialize);
+	L_UIDropDownMenu_SetWidth(ClassicGuildRosterViewDropdown, 150);
 end
 
 function ClassicGuildRosterViewDropdown_Initialize()
-	local info = UIDropDownMenu_CreateInfo();
+	local info = L_UIDropDownMenu_CreateInfo();
 	info.func = ClassicGuildRosterViewDropdown_OnClick;
-	
+
 	info.text = PLAYER_STATUS;
 	info.value = "playerStatus";
-	UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 	info.text = GUILD_STATUS;
 	info.value = "guildStatus";
-	UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 	info.text = ACHIEVEMENT_POINTS;
 	info.value = "achievement";
-	UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 	info.text = TRADE_SKILLS;
 	info.value = "tradeskill";
-	UIDropDownMenu_AddButton(info);	
+	L_UIDropDownMenu_AddButton(info);
 	info.text = GUILD_REPUTATION;
 	info.value = "reputation";
-	UIDropDownMenu_AddButton(info);
-	
-	UIDropDownMenu_SetSelectedValue(ClassicGuildRosterViewDropdown, currentGuildView);
+	L_UIDropDownMenu_AddButton(info);
+
+	L_UIDropDownMenu_SetSelectedValue(ClassicGuildRosterViewDropdown, currentGuildView);
 end
 
 function ClassicGuildRosterViewDropdown_OnClick(self)
@@ -630,7 +630,7 @@ function ClassicGuildRosterViewDropdown_OnClick(self)
 	GuildRoster();
 	ClassicGuildRoster_Update();
 	SetCVar("guildRosterView", currentGuildView);
-	UIDropDownMenu_SetSelectedValue(ClassicGuildRosterViewDropdown, currentGuildView);
+	L_UIDropDownMenu_SetSelectedValue(ClassicGuildRosterViewDropdown, currentGuildView);
 end
 
 --****** Promote/Demote *********************************************************
@@ -670,9 +670,9 @@ function ClassicGuildFramePromoteButton_OnClick(self)
 end
 
 function ClassicGuildMemberRankDropdown_OnLoad(self)
-	UIDropDownMenu_Initialize(self, ClassicGuildMemberRankDropdown_Initialize);
-	UIDropDownMenu_SetWidth(ClassicGuildMemberRankDropdown, 159 - ClassicGuildMemberDetailRankLabel:GetWidth());
-	UIDropDownMenu_JustifyText(ClassicGuildMemberRankDropdown, "LEFT");
+	L_UIDropDownMenu_Initialize(self, ClassicGuildMemberRankDropdown_Initialize);
+	L_UIDropDownMenu_SetWidth(ClassicGuildMemberRankDropdown, 159 - ClassicGuildMemberDetailRankLabel:GetWidth());
+	L_UIDropDownMenu_JustifyText(ClassicGuildMemberRankDropdown, "LEFT");
 end
 
 function ClassicGuildMemberRankDropdown_Initialize(self)
@@ -682,7 +682,7 @@ function ClassicGuildMemberRankDropdown_Initialize(self)
 	memberRankIndex = memberRankIndex + 1;  -- adjust to 1-based
 	local _, _, userRankIndex = GetGuildInfo("player");
 	userRankIndex = userRankIndex + 1;	-- adjust to 1-based
-	
+
 	local highestRank = userRankIndex + 1;
 	if not ( CanGuildPromote() ) then
 		highestRank = memberRankIndex;
@@ -691,9 +691,9 @@ function ClassicGuildMemberRankDropdown_Initialize(self)
 	if not ( CanGuildDemote() ) then
 		lowestRank = memberRankIndex;
 	end
-	
+
 	for listRank = highestRank, lowestRank do
-		local info = UIDropDownMenu_CreateInfo();
+		local info = L_UIDropDownMenu_CreateInfo();
 		info.text = GuildControlGetRankName(listRank);
 		info.func = ClassicGuildMemberRankDropdown_OnClick;
 		info.checked = listRank == memberRankIndex;
@@ -710,7 +710,7 @@ function ClassicGuildMemberRankDropdown_Initialize(self)
 				info.tooltipOnButton = 1;
 			end
 		end
-		UIDropDownMenu_AddButton(info);
+		L_UIDropDownMenu_AddButton(info);
 	end
 end
 

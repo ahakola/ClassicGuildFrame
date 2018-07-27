@@ -346,7 +346,7 @@ function ClassicGuildFrame_TabClicked(self)
 		ClassicFrame.ClassicListDropDownMenu:SetPoint("TOPLEFT", ClassicGuildFrame, -10, -28)
 		ClassicFrame.StreamDropDownMenu:ClearAllPoints();
 		ClassicFrame.StreamDropDownMenu:SetPoint("LEFT", ClassicFrame.ClassicListDropDownMenu, "RIGHT", -25, 0);
-		UIDropDownMenu_SetWidth(ClassicFrame.StreamDropDownMenu, 115);
+		L_UIDropDownMenu_SetWidth(ClassicFrame.StreamDropDownMenu, 115);
 		--ClassicFrame.portrait:Hide();
 		--ClassicFrame.TopLeftCorner:Show();
 		--ClassicFrame.TopBorder:SetPoint("TOPLEFT", ClassicFrame.TopLeftCorner, "TOPRIGHT",  0, 0);
@@ -436,6 +436,7 @@ end
 
 function ClassicGuildBar_SetProgress(bar, currentValue, maxValue)
 	if (maxValue == 0) then
+		currentValue = 1;
 		maxValue = 1;
 	end
 

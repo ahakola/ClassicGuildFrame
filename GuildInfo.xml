@@ -6,7 +6,7 @@
 *******************************************************************************
 	Templates
 *******************************************************************************
--->	
+-->
 	<CheckButton name="ClassicGuildRecruitmentCheckButtonTemplate" virtual="true">
 		<Scripts>
 			<OnClick>
@@ -88,7 +88,7 @@
 				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
 				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
 				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
-				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>	
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
 			</CheckButton>
 		</Frames>
 		<Scripts>
@@ -113,7 +113,7 @@
 	<Button name="ClassicGuildRecruitmentApplicantTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="320" y="84"/>
-		</Size>	
+		</Size>
 		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 			<EdgeSize>
 				<AbsValue val="12"/>
@@ -182,7 +182,7 @@
 					<Size>
 						<AbsDimension x="18" y="18"/>
 					</Size>
-					<TexCoords left="0" right="0.296875" top="0.34375" bottom="0.640625"/>					
+					<TexCoords left="0" right="0.296875" top="0.34375" bottom="0.640625"/>
 				</Texture>
 				<Texture name="$parentHealerTexture" file="Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES" parentKey="healerTex">
 					<Anchors>
@@ -191,7 +191,7 @@
 					<Size>
 						<AbsDimension x="18" y="18"/>
 					</Size>
-					<TexCoords left="0.3125" right="0.609375" top="0.015625" bottom="0.3125"/>					
+					<TexCoords left="0.3125" right="0.609375" top="0.015625" bottom="0.3125"/>
 				</Texture>
 				<Texture name="$parentDamageTexture" file="Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES" parentKey="damageTex">
 					<Anchors>
@@ -200,7 +200,7 @@
 					<Size>
 						<AbsDimension x="18" y="18"/>
 					</Size>
-					<TexCoords left="0.3125" right="0.609375" top="0.34375" bottom="0.640625"/>					
+					<TexCoords left="0.3125" right="0.609375" top="0.34375" bottom="0.640625"/>
 				</Texture>
 			</Layer>
 			<Layer level="ARTWORK" textureSubLevel="2">
@@ -221,7 +221,7 @@
 			<OnLoad>
 				self:SetBackdropColor(1, 1, 1, 0.3);
 				self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-				
+
 				if ( GUILD_APPLICANT_LEVEL_TEXT_Y_OVERRIDE ) then
 					self.level:SetPoint("CENTER", "$parentLevelRing", "CENTER", select(4, self.level:GetPoint("CENTER")), GUILD_APPLICANT_LEVEL_TEXT_Y_OVERRIDE);
 				end
@@ -258,7 +258,7 @@
 					<Size x="28" y="24"/>
 					<Anchors>
 						<Anchor point="RIGHT" relativeTo="$parent" x="-8" y="0"/>
-					</Anchors>	
+					</Anchors>
 					<TexCoords left="0.00195313" right="0.05664063" top="0.00390625" bottom="0.09765625"/>
 				</Texture>
 			</Layer>
@@ -289,7 +289,7 @@
 *******************************************************************************
 	Info panel
 *******************************************************************************
--->	
+-->
 	<Frame name="ClassicGuildInfoFrame" hidden="true" parent="ClassicGuildFrame">
 		<Anchors>
 			<Anchor point="TOPLEFT" relativeTo="$parent" x="4" y="-65"/>
@@ -447,7 +447,7 @@
 					<Anchors>
 						<Anchor point="LEFT" relativeTo="$parentHeader1" x="10" y="0"/>
 					</Anchors>
-				</FontString>	
+				</FontString>
 				<FontString	inherits="GameFontNormal" text="GUILD_MOTD_LABEL">
 					<Size>
 						<AbsDimension x="0" y="0"/>
@@ -627,7 +627,7 @@
 						if ( not GuildControlUI ) then
 							UIParentLoadAddOn("Blizzard_GuildControlUI");
 						end
-						
+
 						local wasShown = GuildControlUI:IsShown();
 						CloseWindows(nil, ClassicGuildFrame);
 						if not wasShown then
@@ -704,7 +704,7 @@
 						<Size x="0" y="30"/>
 						<Anchors>
 							<Anchor point="LEFT" relativeTo="ClassicGuildRecruitmentQuestText" relativePoint="RIGHT" x="0" y="0"/>
-							<Anchor point="RIGHT" relativeTo="ClassicGuildRecruitmentRaidButton" relativePoint="LEFT" x="0" y="0"/>									
+							<Anchor point="RIGHT" relativeTo="ClassicGuildRecruitmentRaidButton" relativePoint="LEFT" x="0" y="0"/>
 						</Anchors>
 						<Layers>
 							<Layer level="ARTWORK">
@@ -1054,7 +1054,7 @@
 												else
 													ClassicGuildRecruitmentCommentEditBoxFill:Show();
 												end
-											</OnTextChanged> 
+											</OnTextChanged>
 											<OnCursorChanged function="ScrollingEdit_OnCursorChanged"/>
 											<OnUpdate>
 												ScrollingEdit_OnUpdate(self, elapsed, self:GetParent());
@@ -1164,7 +1164,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Frame name="ClassicGuildRecruitmentDropDown" inherits="UIDropDownMenuTemplate" hidden="true">
+			<Frame name="ClassicGuildRecruitmentDropDown" inherits="L_UIDropDownMenuTemplate" hidden="true">
 				<Size>
 					<AbsDimension x="10" y="10"/>
 				</Size>
@@ -1182,7 +1182,7 @@
 *******************************************************************************
 	Popups
 *******************************************************************************
--->	
+-->
 	<Frame name="ClassicGuildTextEditFrame" toplevel="true" frameStrata="DIALOG" hidden="true" parent="ClassicGuildFrame" inherits="TranslucentFrameTemplate">
 		<Size>
 			<AbsDimension x="295" y="312"/>
@@ -1245,7 +1245,7 @@
 								<Scripts>
 									<OnTextChanged>
 										ScrollingEdit_OnTextChanged(self, self:GetParent());
-									</OnTextChanged> 
+									</OnTextChanged>
 									<OnCursorChanged function="ScrollingEdit_OnCursorChanged"/>
 									<OnUpdate>
 										ScrollingEdit_OnUpdate(self, elapsed, self:GetParent());

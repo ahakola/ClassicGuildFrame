@@ -295,7 +295,7 @@
 		</Scripts>
 	</Frame>
 
-	<Frame name="StreamDropDownMenuTemplate" inherits="UIDropDownMenuTemplate" mixin="ClassicStreamDropDownMixin" virtual="true">
+	<Frame name="StreamDropDownMenuTemplate" inherits="L_UIDropDownMenuTemplate" mixin="ClassicStreamDropDownMixin" virtual="true">
 		<Size x="40" y="28"/>
 		<Frames>
 			<Frame parentKey="NotificationOverlay" frameLevel="100" setAllPoints="true" hidden="true">
