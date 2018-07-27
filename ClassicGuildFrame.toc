@@ -5,6 +5,7 @@
 ## LoadWith: Blizzard_Communities
 ## Notes: Restoring the old GuildUI for BfA with the Chat from the new CommunitiesUI
 ## RequiredDeps:
+## SavedVariables: ClassicGuildFrameConfig
 
 LibStub\LibStub.lua
 LibUIDropDownMenu\LibUIDropDownMenu.xml

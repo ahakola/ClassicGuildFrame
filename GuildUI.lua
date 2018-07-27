@@ -31,14 +31,40 @@ function ClassicGuildFrame_OnLoad(self)
 	ClassicGuildFrameMembersCount:SetText(onlineAndMobileMembers.." / "..totalMembers);
 end
 
+local function HandleTabs(self)
+	local cfg = ClassicGuildFrameConfig
+
+	local firstTab = false
+	local previousTab = 0
+	for i, show in ipairs(cfg.show) do
+		if show then
+			_G["ClassicGuildFrameTab"..i]:Show()
+			if not firstTab then
+				firstTab = true
+				_G["ClassicGuildFrameTab"..i]:SetPoint("BOTTOMLEFT", ClassicGuildFrame, 0, -30)
+			else
+				_G["ClassicGuildFrameTab"..i]:SetPoint("LEFT", _G["ClassicGuildFrameTab"..previousTab], "RIGHT", -15, 0)
+			end
+			previousTab = i
+		else
+			_G["ClassicGuildFrameTab"..i]:Hide()
+		end
+	end
+
+	if not PanelTemplates_GetSelectedTab(self) or cfg.openAlwaysToDefault then
+		ClassicGuildFrame_TabClicked(_G["ClassicGuildFrameTab"..cfg.defaultTab])
+	end
+end
+
 function ClassicGuildFrame_OnShow(self)
 	PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN);
-	ClassicGuildFrameTab1:Show();
+	--[[ClassicGuildFrameTab1:Show();
 	ClassicGuildFrameTab3:Show();
 	ClassicGuildFrameTab4:Show();
 	ClassicGuildFrameTab2:SetPoint("LEFT", ClassicGuildFrameTab1, "RIGHT", -15, 0);
 	ClassicGuildFrameTab5:SetPoint("LEFT", ClassicGuildFrameTab4, "RIGHT", -15, 0);
-	ClassicGuildFrameTab6:Show();
+	ClassicGuildFrameTab6:Show();]]
+	HandleTabs(self)
 	if ( not PanelTemplates_GetSelectedTab(self) ) then
 		ClassicGuildFrame_TabClicked(ClassicGuildFrameTab1);
 	end
