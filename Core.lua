@@ -58,7 +58,13 @@ do -- Translations
 	elseif LOCALE == "ptBR" then
 
 	elseif LOCALE == "ruRU" then
-
+		-- By Hubbotu
+		L["enableTabs"] = "Включить вкладки:"
+		L["cWarningText"] = "Вы должны оставить хотя бы одну вкладку включенной!"
+		L["defaultTab"] = "Вкладка По умолчанию для первого открытия:"
+		L["dWarningText"] = "Вы должны выбрать вкладку, которая включена!"
+		L["alwaysDefault"] = "Всегда открывайте вкладку по умолчанию:"
+		L["alwaysDefaultHelp"] = "Если отключено, аддон откроется до последней открытой вкладки после первого открытия."
 	elseif LOCALE == "koKR" then
 
 	elseif LOCALE == "zhCN" then
