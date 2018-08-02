@@ -90,7 +90,6 @@ local defaults = { -- This table defines the addon's default settings:
 	openAlwaysToDefault = false
 }
 
-local cfg
 local f = CreateFrame("Frame")
 f:SetScript("OnEvent", function(self, event, ...)
 	return self[event] and self[event](self, event, ...)
@@ -102,7 +101,6 @@ function f:ADDON_LOADED(event, addon)
 	self:UnregisterEvent(event)
 
 	ClassicGuildFrameConfig = initDB(ClassicGuildFrameConfig, defaults)
-	cfg = ClassicGuildFrameConfig
 
 	self.ADDON_LOADED = nil
 end
@@ -116,7 +114,7 @@ do -- Blizzard Options
 
 	Options:SetScript("OnShow", function(self)
 		local cfg = ClassicGuildFrameConfig
-		local Title, EnableTabsText, CWarningText, DefaultDropDownText, DWarningText, DefaultDropDown, AlwaysDefaultText, AlwaysDefaultCheckBox
+		local Title, EnableTabsText, CWarningText, DefaultDropDownText, DWarningText, DefaultDropDown, AlwaysDefaultText, AlwaysDefaultCheckBox, AlwaysDefaultHelpText
 		local function CheckBoxOnClick(button)
 			local checked = not not button:GetChecked()
 
@@ -147,6 +145,15 @@ do -- Blizzard Options
 				end
 			end
 		end
+		local function DropDownOnClick(button)
+			if cfg.show[button.value] then
+				cfg.defaultTab = button.value
+				L_UIDropDownMenu_SetSelectedValue(_G[ADDON_NAME.."OptionsDefaultDropDown"], cfg.defaultTab)
+				DWarningText:Hide()
+			else
+				UIFrameFadeOut(DWarningText, 5, 1, 0)
+			end
+		end
 		local function DefaultDropDown_Initialize()
 			local info = L_UIDropDownMenu_CreateInfo()
 
@@ -154,15 +161,7 @@ do -- Blizzard Options
 				info.text = tabNames[i]
 				info.value = i
 				info.checked = i == cfg.defaultTab
-				info.func = function(button)
-					if cfg.show[button.value] then
-						cfg.defaultTab = button.value
-						L_UIDropDownMenu_SetSelectedValue(_G[ADDON_NAME.."OptionsDefaultDropDown"], cfg.defaultTab)
-						DWarningText:Hide()
-					else
-						UIFrameFadeOut(DWarningText, 5, 1, 0)
-					end
-				end
+				info.func = DropDownOnClick
 				L_UIDropDownMenu_AddButton(info)
 			end
 		end

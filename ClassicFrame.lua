@@ -135,7 +135,8 @@ function ClassicFrameMixin:OnEvent(event, ...)
 	elseif event == "PLAYER_GUILD_UPDATE" then
 		local guildClubId = C_Club.GetGuildClubId();
 		if guildClubId ~= nil and guildClubId == self:GetSelectedClubId() then
-			SetLargeGuildTabardTextures("player", self.PortraitOverlay.TabardEmblem, self.PortraitOverlay.TabardBackground, self.PortraitOverlay.TabardBorder);
+			--SetLargeGuildTabardTextures("player", self.PortraitOverlay.TabardEmblem, self.PortraitOverlay.TabardBackground, self.PortraitOverlay.TabardBorder);
+			SetLargeGuildTabardTextures("player", ClassicGuildFrameTabardEmblem, ClassicGuildFrameTabardBackground, ClassicGuildFrameTabardBorder);
 		end
 	elseif event == "CHANNEL_UI_UPDATE" or event == "UPDATE_CHAT_COLOR" then
 		self:UpdateStreamDropDown();
