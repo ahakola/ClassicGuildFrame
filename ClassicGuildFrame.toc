@@ -10,15 +10,4 @@
 LibStub\LibStub.lua
 LibUIDropDownMenu\LibUIDropDownMenu.xml
 
-GuildUI.xml
-GuildRoster.xml
-GuildNews.xml
-GuildRewards.xml
-GuildInfo.xml
-
-ClassicList.xml
-ClassicChatFrame.xml
-ClassicStreams.xml
-ClassicFrame.xml
-
 Core.lua
