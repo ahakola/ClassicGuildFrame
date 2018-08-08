@@ -263,7 +263,7 @@ function ShowUIPanel(frame, force)
 	end
 
 	--print("ShowUIPanel Hook:", frame:GetName()) -- Debug
-	if frame:GetName() == "CommunitiesFrame" then -- Replace CommunitiesFrame with ClassicGuildUI
+	if frame and frame:GetName() == "CommunitiesFrame" then -- Replace CommunitiesFrame with ClassicGuildUI
 		if not _G.GuildFrame then
 			GuildFrame_LoadUI()
 		end
