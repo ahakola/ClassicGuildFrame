@@ -151,6 +151,9 @@ end
 
 local function _checkUnreadMessages(calledFrom) -- UIFrameFlash the Glow-texture (other option was SetButtonPulse() on the tab)
 	if not cfg.show[1] then return end -- Chat tab is hidden
+	if not classicTabFrame.Tabs then -- No tabs yet, create them
+		_createClassicTabs()
+	end
 	local unreadMessages = CommunitiesUtil.DoesAnyCommunityHaveUnreadMessages()
 	local glow = classicTabFrame.Tabs[1].Glow
 
@@ -283,9 +286,6 @@ local function _hideBlizzardTabs(self) -- Hide Blizzard's own tabs
 			_G["GuildFrameTab"..i]:Hide()
 		end
 	end
-	if not classicTabFrame.Tabs then
-		_createClassicTabs()
-	end
 	classicTabFrame:SetParent(self)
 	classicTabFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
 	classicTabFrame:Show()
@@ -387,7 +387,7 @@ do -- Blizzard Options
 
 	Options:Hide()
 	Options:SetScript("OnShow", function(self)
-		if not classicTabFrame.Tabs then -- Create Tabs if they aren't created yet.
+		if not classicTabFrame.Tabs then -- No tabs yet, create them
 			_createClassicTabs()
 		end
 		local cfg = ClassicGuildFrameConfig
