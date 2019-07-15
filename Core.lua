@@ -76,6 +76,7 @@ do -- Translations
 	end
 end
 
+local hideCommunitiesList = true -- Having this available can foobar the layout if you click on it while in wrong tab
 local communitiesTabs = { -- Parent-keys of CommunitiesUI sidetabs
 	"ChatTab",
 	"RosterTab",
@@ -158,8 +159,9 @@ local function _checkUnreadMessages(calledFrom) -- UIFrameFlash the Glow-texture
 		cfg.highlightStyle = defaultStyle
 	end
 
-	--print("_checkUnreadMessages", tostring(unreadMessages), calledFrom)
-	if cfg.highlightStyle > 1 and unreadMessages and _G.CommunitiesFrame and not _G.CommunitiesFrame:IsShown() then -- Unread messages
+	print(string.format("_checkUnreadMessages -> unreadMessages: %s, calledFrom: %s, highlightStyle: %d, Chat IsShown: %s", tostring(unreadMessages), calledFrom, cfg.highlightStyle, tostring(_G.CommunitiesFrame and _G.CommunitiesFrame.Chat:IsShown() or "No CommunitiesFrame")))
+	if cfg.highlightStyle > 1 and unreadMessages and _G.CommunitiesFrame and not _G.CommunitiesFrame.Chat:IsShown() then -- Unread messages
+		print("-> +++ New unreadMessages")
 		local tex = highlightStyles[cfg.highlightStyle].tex
 		local l, r, t, b = highlightStyles[cfg.highlightStyle].l, highlightStyles[cfg.highlightStyle].r, highlightStyles[cfg.highlightStyle].t, highlightStyles[cfg.highlightStyle].b
 		glow:SetTexture(tex)
@@ -169,6 +171,7 @@ local function _checkUnreadMessages(calledFrom) -- UIFrameFlash the Glow-texture
 			UIFrameFlash(glow, 1, 1, -1, false, cfg.highlightHold, cfg.highlightHold, ADDON_NAME)
 		end
 	else -- No unread messages
+		print("-> --- No unreadMessages")
 		_stopFlashing()
 	end
 end
@@ -178,41 +181,102 @@ local function _TabShow(self, ...) -- Resize tabs on show
 end
 
 local function _TabClick(self, ...) -- Handle Tab clicks
-	local tabIndex = self:GetID();
+	--[[
+		Dump: value=CommunitiesFrame:GetSize()
+		[1]=814.00006103516,
+		[2]=426.00003051758
+
+		Dump: value=CommunitiesFrame:GetSize()
+		[1]=321.99996948242,
+		[2]=406
+
+		Dump: value=CommunitiesFrame.GuildBenefitsFrame:GetWidth()
+		[1]=608.00006103516
+
+		Dump: value=CommunitiesFrame.CommunitiesList:GetWidth()
+		[1]=170.99998474121
+
+		Afaik at least CommuntiesFrame.Chat has protected elemets and that protected status should pour down
+		to some of these frames I touch so... taints maybe?
+	]]--
+	local tabIndex = self:GetID()
 	PanelTemplates_SetTab(classicTabFrame, tabIndex)
 	PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB)
 
 	if tabIndex == 1 then -- Chat
-		HideUIPanel(_G.GuildFrame)
-		HideUIPanel(_G.LookingForGuildFrame)
-		ShowUIPanel(_G.CommunitiesFrame)
+		if cfg.miniMode then
+			_G.CommunitiesFrame:SetDisplayMode(COMMUNITIES_FRAME_DISPLAY_MODES.MINIMIZED)
+			_G.CommunitiesFrame:SetWidth(322)
+		else
+			_G.CommunitiesFrame:SetDisplayMode(COMMUNITIES_FRAME_DISPLAY_MODES.CHAT)
+			_G.CommunitiesFrame:SetWidth(814)
+		end
 
 		_stopFlashing() -- Stop flashing if flashing
 	elseif tabIndex > 1 then -- GuildUI
-		if IsInGuild() then
-			GuildFrame_LoadUI()
-			if GuildFrame_Toggle then
-				ShowUIPanel(_G.GuildFrame)
-			end
-		else
-			LookingForGuildFrame_LoadUI()
-			if LookingForGuildFrame_Toggle then
-				ShowUIPanel(_G.LookingForGuildFrame)
-			end
-		end
-		HideUIPanel(_G.CommunitiesFrame)
 		_checkUnreadMessages("_TabClick")
 
 		if ( tabIndex == 2 ) then -- News
-			GuildFrame_TabClicked(_G["GuildFrameTab1"])
+			_G.CommunitiesFrame:SetDisplayMode(COMMUNITIES_FRAME_DISPLAY_MODES.GUILD_INFO)
+			_G.CommunitiesFrame.CommunitiesList:Hide()
+			_G.CommunitiesFrame.GuildLogButton:Hide()
+			_G.CommunitiesFrame.GuildDetailsFrame.Info:Hide()
+			_G.CommunitiesFrame.GuildDetailsFrame.News:Show()
+
+			if hideCommunitiesList then
+				_G.CommunitiesFrame:SetWidth(336) -- Without the CommunitiesList
+			else
+				_G.CommunitiesFrame:SetWidth(523) -- With the CommunitiesList
+			end
+
 		elseif ( tabIndex == 3 ) then -- Roster
-			GuildFrame_TabClicked(_G["GuildFrameTab2"])
+			_G.CommunitiesFrame:SetDisplayMode(COMMUNITIES_FRAME_DISPLAY_MODES.ROSTER)
+			_G.CommunitiesFrame:SetWidth(814)
+			-- Some of the columns get stacked on top of each other sometimes when we go to the smaller tabs before coming to Roster-tab
+			-- This should update the Roster-list so the colums should be on right places
+			_G.CommunitiesFrame.MemberList:Update()
+
 		elseif ( tabIndex == 4 ) then -- Perks
-			GuildFrame_TabClicked(_G["GuildFrameTab3"])
+			_G.CommunitiesFrame:SetDisplayMode(COMMUNITIES_FRAME_DISPLAY_MODES.GUILD_BENEFITS)
+			_G.CommunitiesFrame.CommunitiesList:Hide()
+			_G.CommunitiesFrame.GuildBenefitsFrame.Perks:Show()
+			_G.CommunitiesFrame.GuildBenefitsFrame.FactionFrame:Show()
+			_G.CommunitiesFrame.GuildBenefitsFrame.Rewards:Hide()
+			_G.CommunitiesFrame.GuildBenefitsFrame.GuildRewardsTutorialButton:Hide()
+
+			if hideCommunitiesList then
+				_G.CommunitiesFrame:SetWidth(301) -- Without the CommunitiesList
+			else
+				_G.CommunitiesFrame:SetWidth(488) -- With the CommunitiesList
+			end
+
 		elseif ( tabIndex == 5 ) then -- Rewards
-			GuildFrame_TabClicked(_G["GuildFrameTab4"])
+			_G.CommunitiesFrame:SetDisplayMode(COMMUNITIES_FRAME_DISPLAY_MODES.GUILD_BENEFITS)
+			_G.CommunitiesFrame.CommunitiesList:Hide()
+			_G.CommunitiesFrame.GuildBenefitsFrame.Perks:Hide()
+			_G.CommunitiesFrame.GuildBenefitsFrame.FactionFrame:Hide()
+			_G.CommunitiesFrame.GuildBenefitsFrame.Rewards:Show()
+			_G.CommunitiesFrame.GuildBenefitsFrame.GuildRewardsTutorialButton:Show()
+
+			if hideCommunitiesList then
+				_G.CommunitiesFrame:SetWidth(336) -- Without the CommunitiesList
+			else
+				_G.CommunitiesFrame:SetWidth(523) -- With the CommunitiesList
+			end
+
 		elseif ( tabIndex == 6 ) then -- Info
-			GuildFrame_TabClicked(_G["GuildFrameTab5"])
+			_G.CommunitiesFrame:SetDisplayMode(COMMUNITIES_FRAME_DISPLAY_MODES.GUILD_INFO)
+			_G.CommunitiesFrame.CommunitiesList:Hide()
+			_G.CommunitiesFrame.GuildLogButton:Show()
+			_G.CommunitiesFrame.GuildDetailsFrame.Info:Show()
+			_G.CommunitiesFrame.GuildDetailsFrame.News:Hide()
+
+			if hideCommunitiesList then
+				_G.CommunitiesFrame:SetWidth(301) -- Without the CommunitiesList
+			else
+				_G.CommunitiesFrame:SetWidth(488) -- With the CommunitiesList
+			end
+
 		end
 	end
 end
@@ -244,6 +308,14 @@ local function _createClassicTabs() -- Create new tabs for Classic Guild Frame
 	classicTabFrame:Hide()
 end
 
+local function _selectTab()
+	if not PanelTemplates_GetSelectedTab(classicTabFrame) then
+		_TabClick(classicTabFrame.Tabs[cfg.defaultTab])
+	else
+		_TabClick(classicTabFrame.Tabs[PanelTemplates_GetSelectedTab(classicTabFrame)])
+	end
+end
+
 local function _HandleTabs() -- Handle hiding and anchoring Classic Guild Frame tabs
 	local firstTab = false
 	local previousTab = 0
@@ -265,35 +337,175 @@ local function _HandleTabs() -- Handle hiding and anchoring Classic Guild Frame 
 
 	_checkUnreadMessages("_HandleTabs")
 
-	if not PanelTemplates_GetSelectedTab(classicTabFrame) then
-		_TabClick(classicTabFrame.Tabs[cfg.defaultTab])
-	end
+	_selectTab()
 end
 
 local function _hideBlizzardTabs(self) -- Hide Blizzard's own tabs
-	if self:GetName() == "CommunitiesFrame" then -- Blizzard_Communities
-		for _, key in ipairs(communitiesTabs) do
-			_G.CommunitiesFrame[key]:Hide()
-		end
-	else -- Blizzard_GuildUI
-		for i = 1, 5 do
-			_G["GuildFrameTab"..i]:Hide()
-		end
+	for _, key in ipairs(communitiesTabs) do
+		--_G.CommunitiesFrame[key]:Hide()
 	end
+
 	classicTabFrame:SetParent(self)
 	classicTabFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
 	classicTabFrame:Show()
 	_HandleTabs()
 end
 
+local setupDone = false
+local function _setUpCommunities() -- Finetuning to the Communities UI, this should be taint-safe if done out of combat?
+	if setupDone then return end
+	local point, relativeTo, relativePoint, xOfs, yOfs
+
+	if hideCommunitiesList then -- Without the CommunitiesList
+		-- News
+			-- Finetuning
+			-- -170/+40
+
+			-- TitleText
+			-- TOPLEFT News TOPLEFT 3 35
+			-- 13 pixels
+			-- +7 pixels to match Perks
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildDetailsFrame.News.TitleText:GetPoint()
+			_G.CommunitiesFrame.GuildDetailsFrame.News.TitleText:SetPoint(point, relativeTo, relativePoint, 60, yOfs)
+
+			-- InsetBorders
+			-- TOPLEFT Info TOPRIGHT 12 3
+			-- -170 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildDetailsFrame.InsetBorderTopRight:GetPoint()
+			_G.CommunitiesFrame.GuildDetailsFrame.InsetBorderTopRight:SetPoint(point, relativeTo, relativePoint, -158, yOfs)
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildDetailsFrame.InsetBorderBottomRight:GetPoint()
+			_G.CommunitiesFrame.GuildDetailsFrame.InsetBorderBottomRight:SetPoint(point, relativeTo, relativePoint, -158, yOfs)
+
+		-- Roster
+
+		-- Perks
+			-- Finetuning
+			-- -187/+57
+
+			-- TitleText
+			-- TOPLEFT Info TOPLEFT 10 35
+			-- 0 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildBenefitsFrame.Perks.TitleText:GetPoint()
+			_G.CommunitiesFrame.GuildBenefitsFrame.Perks.TitleText:SetPoint(point, relativeTo, relativePoint, 57, yOfs)
+
+			-- Perks
+			-- TOPLEFT GuildBenefitsFrame TOPLEFT 0 0
+			-- -187 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildBenefitsFrame.Perks:GetPoint()
+			_G.CommunitiesFrame.GuildBenefitsFrame.Perks:SetPoint(point, relativeTo, relativePoint, -187, yOfs)
+
+			-- FactionFrame
+			-- BOTTOMLEFT GuildBenefitsFrame BOTTOMLEFT 0 -25
+			-- -187 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildBenefitsFrame.FactionFrame:GetPoint()
+			_G.CommunitiesFrame.GuildBenefitsFrame.FactionFrame:SetPoint(point, _G.CommunitiesFrame.GuildBenefitsFrame.Perks, relativePoint, xOfs, yOfs)
+
+		-- Rewards
+			-- Finetuning
+			-- -170/+40
+
+			-- TitleText
+			-- TOPLEFT Rewards TOPLEFT 0 35
+			-- 10 pixels
+			-- +7 pixels to match Perks
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildBenefitsFrame.Rewards.TitleText:GetPoint()
+			_G.CommunitiesFrame.GuildBenefitsFrame.Rewards.TitleText:SetPoint(point, relativeTo, relativePoint, 57, yOfs)
+
+			-- InsetBorders
+			-- TOPLEFT Perks TOPRIGHT 12 3
+			-- - 170 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildBenefitsFrame.InsetBorderTopRight:GetPoint()
+			_G.CommunitiesFrame.GuildBenefitsFrame.InsetBorderTopRight:SetPoint(point, relativeTo, relativePoint, -158, yOfs)
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildBenefitsFrame.InsetBorderBottomRight:GetPoint()
+			_G.CommunitiesFrame.GuildBenefitsFrame.InsetBorderBottomRight:SetPoint(point, relativeTo, relativePoint, -158, yOfs)
+
+		-- Info
+			-- Finetuning
+			-- -187/+57
+
+			-- TitleText
+			-- TOPLEFT Info TOPLEFT 10 35
+			-- 0 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildDetailsFrame.Info.TitleText:GetPoint()
+			_G.CommunitiesFrame.GuildDetailsFrame.Info.TitleText:SetPoint(point, relativeTo, relativePoint, 57, yOfs)
+
+			-- Info
+			-- TOPLEFT GuildDetailsFrame TOPLEFT 0 0
+			-- -187 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildDetailsFrame.Info:GetPoint()
+			_G.CommunitiesFrame.GuildDetailsFrame.Info:SetPoint(point, relativeTo, relativePoint, -187, yOfs)
+
+			-- GuildLogButton
+			-- BOTTOMLEFT CommunitiesFrame BOTTOMLEFT 190 5
+			-- -187 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildLogButton:GetPoint()
+			_G.CommunitiesFrame.GuildLogButton:SetPoint(point, relativeTo, relativePoint, 3, yOfs)
+
+	else -- With the CommunitiesList
+		-- News
+			-- Finetuning
+			-- -170/+40
+
+			-- TitleText
+			-- TOPLEFT News TOPLEFT 3 35
+			-- 13 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildDetailsFrame.News.TitleText:GetPoint()
+			_G.CommunitiesFrame.GuildDetailsFrame.News.TitleText:SetPoint(point, relativeTo, relativePoint, 13, yOfs)
+
+		-- Roster
+
+		-- Perks
+			-- Finetuning
+			-- -187/+57
+
+			-- InsetBorders
+			-- TOPRIGHT Rewards TOPLEFT 3 3
+			-- +35 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildBenefitsFrame.InsetBorderTopLeft:GetPoint()
+			_G.CommunitiesFrame.GuildBenefitsFrame.InsetBorderTopLeft:SetPoint(point, relativeTo, relativePoint, 38, yOfs)
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildBenefitsFrame.InsetBorderBottomLeft:GetPoint()
+			_G.CommunitiesFrame.GuildBenefitsFrame.InsetBorderBottomLeft:SetPoint(point, relativeTo, relativePoint, 38, yOfs)
+
+		-- Rewards
+			-- Finetuning
+			-- -170/+40
+
+			-- TitleText
+			-- TOPLEFT Rewards TOPLEFT 0 35
+			-- 10 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildBenefitsFrame.Rewards.TitleText:GetPoint()
+			_G.CommunitiesFrame.GuildBenefitsFrame.Rewards.TitleText:SetPoint(point, relativeTo, relativePoint, 10, yOfs)
+
+		-- Info
+			-- Finetuning
+			-- -187/+57
+
+			-- InsetBorders
+			-- TOPRIGHT News TOPLEFT 3 3
+			-- +35 pixels
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildDetailsFrame.InsetBorderTopLeft:GetPoint()
+			_G.CommunitiesFrame.GuildDetailsFrame.InsetBorderTopLeft:SetPoint(point, relativeTo, relativePoint, 38, yOfs)
+			point, relativeTo, relativePoint, xOfs, yOfs = _G.CommunitiesFrame.GuildDetailsFrame.InsetBorderBottomLeft:GetPoint()
+			_G.CommunitiesFrame.GuildDetailsFrame.InsetBorderBottomLeft:SetPoint(point, relativeTo, relativePoint, 38, yOfs)
+
+	end
+
+	setupDone = true
+end
+
 local function _MinimizeHook()
 	cfg.miniMode = true
+	--_TabClick(classicTabFrame.Tabs[1])
+	_selectTab() -- Return to the last open tab after pressing the MaximizeMinimizeFrame
 end
 
 local function _MaximizeHook()
 	cfg.miniMode = false
+	--_TabClick(classicTabFrame.Tabs[1])
+	_selectTab() -- Return to the last open tab after pressing the MaximizeMinimizeFrame
 end
 
+local hooked = false
 function f:ADDON_LOADED(event, addon)
 	if addon == ADDON_NAME then
 		ClassicGuildFrameConfig = initDB(ClassicGuildFrameConfig, defaults)
@@ -302,77 +514,30 @@ function f:ADDON_LOADED(event, addon)
 		_createClassicTabs() -- Create Tabs
 		self:RegisterEvent("STREAM_VIEW_MARKER_UPDATED") -- Chat updated
 
-		if IsAddOnLoaded("Blizzard_Communities") and _G.CommunitiesFrame then
+		if not hooked and IsAddOnLoaded("Blizzard_Communities") and _G.CommunitiesFrame then
 			_G.CommunitiesFrame:HookScript("OnShow", _hideBlizzardTabs)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Minimize", _MinimizeHook)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Maximize", _MaximizeHook)
-		end
-		if IsAddOnLoaded("Blizzard_GuildUI") and _G.GuildFrame then
-			_G.GuildFrame:HookScript("OnShow", _hideBlizzardTabs)
+			_setUpCommunities() -- Setup the Communities fixes
+
+			hooked = true
+			self:UnregisterEvent(event)
 		end
 	elseif addon == "Blizzard_Communities" then
-		if IsAddOnLoaded(ADDON_NAME) then
+		if not hooked and IsAddOnLoaded(ADDON_NAME) then
 			_G.CommunitiesFrame:HookScript("OnShow", _hideBlizzardTabs)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Minimize", _MinimizeHook)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Maximize", _MaximizeHook)
-		end
-		if IsAddOnLoaded("Blizzard_GuildUI") and _G.GuildFrame then
-			_G.GuildFrame:HookScript("OnShow", _hideBlizzardTabs)
-		end
-	elseif addon == "Blizzard_GuildUI" then
-		if IsAddOnLoaded(ADDON_NAME) then
-			_G.GuildFrame:HookScript("OnShow", _hideBlizzardTabs)
-		end
-		if IsAddOnLoaded("Blizzard_Communities") and _G.CommunitiesFrame then
-			_G.CommunitiesFrame:HookScript("OnShow", _hideBlizzardTabs)
-			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Minimize", _MinimizeHook)
-			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Maximize", _MaximizeHook)
+			_setUpCommunities() -- Setup the Communities fixes
+
+			hooked = true
+			self:UnregisterEvent(event)
 		end
 	else return end
 end
 
 function f:STREAM_VIEW_MARKER_UPDATED(event, clubId, streamId, lastUnreadTime)
 	_checkUnreadMessages("STREAM_VIEW_MARKER_UPDATED")
-end
-
-local originalShowUIPanel = ShowUIPanel
-function ShowUIPanel(frame, force)
-	local function _checkChatFrameSize() -- Set Chat-frame Maximized/Minimized based on setting
-		if cfg.miniMode then
-			_G.CommunitiesFrame.MaximizeMinimizeFrame:Minimize()
-		else
-			_G.CommunitiesFrame.MaximizeMinimizeFrame:Maximize()
-		end
-	end
-
-	--print("ShowUIPanel Hook:", frame:GetName()) -- Debug
-	if frame and frame:GetName() == "CommunitiesFrame" then -- Replace CommunitiesFrame with ClassicGuildUI
-		if not _G.GuildFrame then
-			GuildFrame_LoadUI()
-		end
-		if _G.GuildFrame:IsShown() then -- GuildUI is open, close it to mimic Toggle-action
-			HideUIPanel(_G.GuildFrame)
-			return
-		else
-			if not PanelTemplates_GetSelectedTab(classicTabFrame) then
-				if cfg.defaultTab == 1 then
-					_checkChatFrameSize()
-					return originalShowUIPanel(frame, force)
-				else
-					return originalShowUIPanel(_G.GuildFrame, force)
-				end
-			else
-				if PanelTemplates_GetSelectedTab(classicTabFrame) == 1 then
-					_checkChatFrameSize()
-					return originalShowUIPanel(frame, force)
-				else
-					return originalShowUIPanel(_G.GuildFrame, force)
-				end
-			end
-		end
-	else -- Let rest go through as usual
-		return originalShowUIPanel(frame, force)
-	end
 end
 
 do -- Blizzard Options
