@@ -11,7 +11,7 @@ Restores the look and functionality of the old GuildUI by changing the look of t
 * You can have the `Chat`-tab glow if you have unread messages in your communities.
 
 ## ABOUT TAINTS
-Unlike the previous versions with either custom UI or replaced ShowUIPanel-function, this new version is built completely by reusing Blizzard's own `Blizzard_Communities` elements and **should** be taint-free. In my own tests, everything worked in and out of combat and I couldn't find any taints, but if you run into any errors, please let me know.
+Unlike the previous versions with either custom UI (v1.0) or replaced ShowUIPanel-function (v1.1), this new version (v1.2) is built completely by reusing Blizzard's own `Blizzard_Communities` elements and **should** be taint-free. In my own tests, everything worked in and out of combat and I couldn't find any taints, but if you run into any errors, please let me know.
 
 ## Translations
 You can help translate the addon by heading to the Curseforge's [Translation tool](https://www.curseforge.com/wow/addons/classic-guild-frame/localization) and PM me to let me know there are new translations (the new Curseforge-site makes it really hard to keep track of what has been done to the translations).

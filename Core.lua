@@ -190,10 +190,22 @@ local function _checkUnreadMessages(calledFrom) -- UIFrameFlash the Glow-texture
 end
 
 local function _TabShow(self, ...) -- Resize tabs on show
-	PanelTemplates_TabResize(self, 0)
-	local oldWidth = self:GetWidth()
-	self:SetWidth(oldWidth - 4) -- Tighten the tabs a bit to make sure they all fit under the frame
+	PanelTemplates_TabResize(self, -7)
+	--local oldWidth = self:GetWidth()
+	--self:SetWidth(oldWidth - 4) -- Tighten the tabs a bit to make sure they all fit under the frame
 	--print("Tab width:", tostring(oldWidth), tostring(self:GetWidth()))
+end
+
+local function _hideBlizzardTabs(self) -- Hide Blizzard's own tabs
+	for _, key in ipairs(communitiesTabs) do
+		_G.CommunitiesFrame[key]:Hide()
+	end
+
+	if self then
+		classicTabFrame:SetParent(self)
+		classicTabFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+		classicTabFrame:Show()
+	end
 end
 
 local function _TabClick(self, ...) -- Handle Tab clicks
@@ -227,6 +239,7 @@ local function _TabClick(self, ...) -- Handle Tab clicks
 			_G.CommunitiesFrame.GuildLogButton:Hide()
 			_G.CommunitiesFrame.GuildDetailsFrame.Info:Hide()
 			_G.CommunitiesFrame.GuildDetailsFrame.News:Show()
+			_G.CommunitiesFrame.CommunitiesControlFrame:Hide() -- Let's hide this if you visited Info-tab and showed 'GuildControlButton'
 
 			_G.CommunitiesFrame:SetWidth(336)
 
@@ -263,11 +276,14 @@ local function _TabClick(self, ...) -- Handle Tab clicks
 			_G.CommunitiesFrame.GuildLogButton:Show()
 			_G.CommunitiesFrame.GuildDetailsFrame.Info:Show()
 			_G.CommunitiesFrame.GuildDetailsFrame.News:Hide()
+			_G.CommunitiesFrame.CommunitiesControlFrame:Show() -- Let's show this if you visited News-tab and hid 'GuildControlButton'
 
 			_G.CommunitiesFrame:SetWidth(301)
 
 		end
 	end
+
+	_hideBlizzardTabs() -- Apparently the Blizzard Tabs show up again sometimes, so we hide them with every tab-click
 end
 
 local function _createClassicTabs() -- Create new tabs for Classic Guild Frame
@@ -305,7 +321,7 @@ local function _selectTab()
 	end
 end
 
-local function _HandleTabs() -- Handle hiding and anchoring Classic Guild Frame tabs
+local function _HandleTabs(self) -- Handle hiding and anchoring Classic Guild Frame tabs
 	local firstTab = false
 	local previousTab = 0
 	for i, show in ipairs(cfg.show) do
@@ -325,19 +341,9 @@ local function _HandleTabs() -- Handle hiding and anchoring Classic Guild Frame 
 	end
 
 	_checkUnreadMessages("_HandleTabs")
+	_hideBlizzardTabs(self)
 
 	_selectTab()
-end
-
-local function _hideBlizzardTabs(self) -- Hide Blizzard's own tabs
-	for _, key in ipairs(communitiesTabs) do
-		_G.CommunitiesFrame[key]:Hide()
-	end
-
-	classicTabFrame:SetParent(self)
-	classicTabFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
-	classicTabFrame:Show()
-	_HandleTabs()
 end
 
 local setupDone = false
@@ -450,7 +456,7 @@ function f:ADDON_LOADED(event, addon)
 		self:RegisterEvent("CLUB_INVITATION_REMOVED_FOR_SELF") -- Invitation removed for self
 
 		if not hooked and IsAddOnLoaded("Blizzard_Communities") and _G.CommunitiesFrame then
-			_G.CommunitiesFrame:HookScript("OnShow", _hideBlizzardTabs)
+			_G.CommunitiesFrame:HookScript("OnShow", _HandleTabs)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Minimize", _MinimizeHook)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Maximize", _MaximizeHook)
 			_setUpCommunities() -- Setup the Communities fixes
@@ -460,7 +466,7 @@ function f:ADDON_LOADED(event, addon)
 		end
 	elseif addon == "Blizzard_Communities" then
 		if not hooked and IsAddOnLoaded(ADDON_NAME) then
-			_G.CommunitiesFrame:HookScript("OnShow", _hideBlizzardTabs)
+			_G.CommunitiesFrame:HookScript("OnShow", _HandleTabs)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Minimize", _MinimizeHook)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Maximize", _MaximizeHook)
 			_setUpCommunities() -- Setup the Communities fixes
@@ -628,7 +634,8 @@ do -- Blizzard Options
 		DefaultDropDownText:SetJustifyH("LEFT")
 		DefaultDropDownText:SetText(L.defaultTab)
 
-		DefaultDropDown = CreateFrame("Button", "$parentDefaultDropDown", self, "L_UIDropDownMenuTemplate")
+		--DefaultDropDown = CreateFrame("Button", "$parentDefaultDropDown", self, "L_UIDropDownMenuTemplate")
+		DefaultDropDown = L_Create_UIDropDownMenu(self:GetName().."DefaultDropDown", self) -- https://www.curseforge.com/wow/addons/libuidropdownmenu/pages/faq/changes-regarding-to-dropdown-templates-usage
 		L_UIDropDownMenu_Initialize(DefaultDropDown, DefaultDropDown_Initialize)
 		L_UIDropDownMenu_SetSelectedValue(DefaultDropDown, cfg.defaultTab)
 		L_UIDropDownMenu_JustifyText(DefaultDropDown, "CENTER")
@@ -695,7 +702,8 @@ do -- Blizzard Options
 		HighlightDropDownText:SetJustifyH("LEFT")
 		HighlightDropDownText:SetText(L.highlightStyle)
 
-		HighlightDropDown = CreateFrame("Button", "$parentHighlightDropDown", self, "L_UIDropDownMenuTemplate")
+		--HighlightDropDown = CreateFrame("Button", "$parentHighlightDropDown", self, "L_UIDropDownMenuTemplate")
+		HighlightDropDown = L_Create_UIDropDownMenu(self:GetName().."HighlightDropDown", self) -- https://www.curseforge.com/wow/addons/libuidropdownmenu/pages/faq/changes-regarding-to-dropdown-templates-usage
 		L_UIDropDownMenu_Initialize(HighlightDropDown, HighlightDropDown_Initialize)
 		L_UIDropDownMenu_SetSelectedValue(HighlightDropDown, cfg.highlightStyle)
 		L_UIDropDownMenu_JustifyText(HighlightDropDown, "CENTER")
