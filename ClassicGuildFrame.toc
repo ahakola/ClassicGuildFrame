@@ -2,7 +2,6 @@
 ## Author: Sanex (Arathor EU)
 ## Title: Classic Guild Frame
 ## Version: @project-version@
-## LoadWith: Blizzard_Communities
 ## Notes: Restoring the old GuildUI for BfA with the Chat from the new CommunitiesUI
 ## RequiredDeps:
 ## SavedVariables: ClassicGuildFrameConfig
