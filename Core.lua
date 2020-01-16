@@ -753,6 +753,48 @@ end
 -- https://www.townlong-yak.com/bugs/PfF9rr-UIDropDownMenu
 
 --[[----------------------------------------------------------------------------
+	=== UIDropDownMenu_GetSelectedID taints dropdown initialization
+	https://www.townlong-yak.com/bugs/afKy4k-GetSelectedIDTaint
+
+	Calling UIDropDownMenu_Initialize may taint the current execution if an
+	addon has used the dropdown infrastructure recently, and if the dropdown
+	being initialized does not have a selected name, but does have a selected
+	value that doesn't correspond to its first entry.
+
+	In Blizzard_PVPUI, a dropdown is used to select a PvP queue type,
+	preventing the player from joining PvP queues if the dropdown becomes
+	tainted. In patch 7.3.5, this could happen when Blizzard_PVPUI loaded,
+	without additional player interaction.
+
+	Fixed in: 8.1.0.27934: UIDropDownMenu_GetSelectedID only iterates through
+	entries in the current menu, and UIDropDownMenu_CreateInfo always returns
+	fresh tables.
+
+	Affected versions: 7.3.5, 8.0.1.
+----------------------------------------------------------------------------]]--
+-- Not 100% sure this is really fixed, so I'm including this one also
+if (UIDROPDOWNMENU_VALUE_PATCH_VERSION or 0) < 2 then
+	UIDROPDOWNMENU_VALUE_PATCH_VERSION = 2
+	hooksecurefunc("UIDropDownMenu_InitializeHelper", function()
+		if UIDROPDOWNMENU_VALUE_PATCH_VERSION ~= 2 then
+			return
+		end
+		for i=1, UIDROPDOWNMENU_MAXLEVELS do
+			for j=1, UIDROPDOWNMENU_MAXBUTTONS do
+				local b = _G["DropDownList" .. i .. "Button" .. j]
+				if not (issecurevariable(b, "value") or b:IsShown()) then
+					b.value = nil
+					repeat
+						j, b["fx" .. j] = j+1
+					until issecurevariable(b, "value")
+				end
+			end
+		end
+	end)
+end
+
+
+--[[----------------------------------------------------------------------------
 	=== UIDropDownMenu displayMode taints dropdown initialization
 	https://www.townlong-yak.com/bugs/Kjq4hm-DisplayModeTaint
 
@@ -819,6 +861,47 @@ if (COMMUNITY_UIDD_REFRESH_PATCH_VERSION or 0) < 1 then
 	hooksecurefunc("SetCVar", function(n)
 		if n == "lastSelectedClubId" then
 			CleanDropdowns()
+		end
+	end)
+end
+
+--[[----------------------------------------------------------------------------
+	=== UIDropDownMenu_Refresh accesses uninitialized buttons
+	https://www.townlong-yak.com/bugs/Mx7CWN-RefreshOverread
+
+	UIDropDownMenu_Refresh, called by UIDropDownMenu_SetSelected*, accesses
+	buttons beyond those present and initialized by the current dropdown. If
+	the previously-open dropdown was insecure and used specific info keys, this
+	will taint the current execution.
+
+	UIDropDownMenu_SetSelected* is widely used on secure execution paths.
+	Blizzard_CUFProfiles is one example of this, causing errors when the
+	Interface Options frame is closed while in combat lockdown.
+
+	Affected versions: 8.2.5.32144 (unfixed).
+----------------------------------------------------------------------------]]--
+if (UIDD_REFRESH_OVERREAD_PATCH_VERSION or 0) < 1 then
+	UIDD_REFRESH_OVERREAD_PATCH_VERSION = 1
+	local function drop(t, k)
+		local c = 42
+		t[k] = nil
+		while not issecurevariable(t, k) do
+			if t[c] == nil then
+				t[c] = nil
+			end
+			c = c + 1
+		end
+	end
+	hooksecurefunc("UIDropDownMenu_InitializeHelper", function()
+		if UIDD_REFRESH_OVERREAD_PATCH_VERSION ~= 1 then
+			return
+		end
+		for i=1,UIDROPDOWNMENU_MAXLEVELS do
+			for j=1,UIDROPDOWNMENU_MAXBUTTONS do
+				local b, _ = _G["DropDownList" .. i .. "Button" .. j]
+				_ = issecurevariable(b, "checked")      or drop(b, "checked")
+				_ = issecurevariable(b, "notCheckable") or drop(b, "notCheckable")
+			end
 		end
 	end)
 end

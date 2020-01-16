@@ -18,11 +18,13 @@ At the moment there isn't fix for this because I don't know what part of my addo
 
 In game version 8.2 taintlog level 2 gives following information:
 
-`9/10 17:36:44.562  Interface\FrameXML\StaticPopup.lua:5042 StaticPopup_OnClick()`
-`9/10 17:36:44.562  An action was blocked because of taint from ClassicGuildFrame - SetNote()`
-`9/10 17:36:44.562      Interface\FrameXML\StaticPopup.lua:2783 OnAccept()`
-`9/10 17:36:44.562      Interface\FrameXML\StaticPopup.lua:5074 StaticPopup_OnClick()`
-`9/10 17:36:44.562      StaticPopup1Button1:OnClick()`
+```
+9/10 17:36:44.562  Interface\FrameXML\StaticPopup.lua:5042 StaticPopup_OnClick()
+9/10 17:36:44.562  An action was blocked because of taint from ClassicGuildFrame - SetNote()
+9/10 17:36:44.562      Interface\FrameXML\StaticPopup.lua:2783 OnAccept()
+9/10 17:36:44.562      Interface\FrameXML\StaticPopup.lua:5074 StaticPopup_OnClick()
+9/10 17:36:44.562      StaticPopup1Button1:OnClick()
+```
 
 ## Translations
 You can help translate the addon by heading to the Curseforge's [Translation tool](https://www.curseforge.com/wow/addons/classic-guild-frame/localization) and PM me to let me know there are new translations (the new Curseforge-site makes it really hard to keep track of what has been done to the translations).
