@@ -1,11 +1,12 @@
-## Interface: 80300
+## Interface: 90000
 ## Author: Sanex (Arathor EU)
 ## Title: Classic Guild Frame
 ## Version: @project-version@
-## Notes: Restoring the old GuildUI for BfA with the Chat from the new CommunitiesUI
+## Notes: Restoring the old GuildUI for BfA and later with the Chat from the new CommunitiesUI
 ## RequiredDeps:
 ## SavedVariables: ClassicGuildFrameConfig
 
+TaintLess.xml
 LibStub\LibStub.lua
 LibUIDropDownMenu\LibUIDropDownMenu.xml
 

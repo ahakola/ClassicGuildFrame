@@ -327,6 +327,8 @@ local function _createClassicTabs() -- Create new tabs for Classic Guild Frame
 end
 
 local function _selectTab()
+	if not IsInGuild() then return end -- Abort if not in a guild, otherwise this breaks Guild Finder...
+
 	if cfg.openAlwaysToDefault or (not PanelTemplates_GetSelectedTab(classicTabFrame)) then -- Always open to Default Tab or no SelectedTab
 		_TabClick(classicTabFrame.Tabs[cfg.defaultTab])
 	else
@@ -337,8 +339,9 @@ end
 local function _HandleTabs(self) -- Handle hiding and anchoring Classic Guild Frame tabs
 	local firstTab = false
 	local previousTab = 0
+	local isGuilded = IsInGuild() -- Hide tabs if not in a guild
 	for i, show in ipairs(cfg.show) do
-		if show then
+		if isGuilded and show then
 			classicTabFrame.Tabs[i]:Show()
 			classicTabFrame.Tabs[i]:ClearAllPoints()
 			if not firstTab then
@@ -470,6 +473,7 @@ function f:ADDON_LOADED(event, addon)
 		self:RegisterEvent("STREAM_VIEW_MARKER_UPDATED") -- Chat updated
 		self:RegisterEvent("CLUB_INVITATION_ADDED_FOR_SELF") -- Invitation added for self
 		self:RegisterEvent("CLUB_INVITATION_REMOVED_FOR_SELF") -- Invitation removed for self
+		self:RegisterEvent("PLAYER_GUILD_UPDATE") -- This appears to be fired when a player is gkicked, gquits, etc.
 
 		if not hooked and IsAddOnLoaded("Blizzard_Communities") and _G.CommunitiesFrame then
 			_G.CommunitiesFrame:HookScript("OnShow", _HandleTabs)
@@ -509,6 +513,10 @@ end
 
 function f:CLUB_INVITATION_REMOVED_FOR_SELF(event, invitationId)
 	_checkUnreadMessages("CLUB_INVITATION_REMOVED_FOR_SELF")
+end
+
+function f:PLAYER_GUILD_UPDATE(event, unitTarget)
+	_HandleTabs()
 end
 
 do -- Blizzard Options
@@ -750,158 +758,6 @@ do -- Blizzard Options
 end
 
 -- Taint prevention for CommunitiesUI
--- https://www.townlong-yak.com/bugs/PfF9rr-UIDropDownMenu
-
---[[----------------------------------------------------------------------------
-	=== UIDropDownMenu_GetSelectedID taints dropdown initialization
-	https://www.townlong-yak.com/bugs/afKy4k-GetSelectedIDTaint
-
-	Calling UIDropDownMenu_Initialize may taint the current execution if an
-	addon has used the dropdown infrastructure recently, and if the dropdown
-	being initialized does not have a selected name, but does have a selected
-	value that doesn't correspond to its first entry.
-
-	In Blizzard_PVPUI, a dropdown is used to select a PvP queue type,
-	preventing the player from joining PvP queues if the dropdown becomes
-	tainted. In patch 7.3.5, this could happen when Blizzard_PVPUI loaded,
-	without additional player interaction.
-
-	Fixed in: 8.1.0.27934: UIDropDownMenu_GetSelectedID only iterates through
-	entries in the current menu, and UIDropDownMenu_CreateInfo always returns
-	fresh tables.
-
-	Affected versions: 7.3.5, 8.0.1.
-----------------------------------------------------------------------------]]--
--- Not 100% sure this is really fixed, so I'm including this one also
-if (UIDROPDOWNMENU_VALUE_PATCH_VERSION or 0) < 2 then
-	UIDROPDOWNMENU_VALUE_PATCH_VERSION = 2
-	hooksecurefunc("UIDropDownMenu_InitializeHelper", function()
-		if UIDROPDOWNMENU_VALUE_PATCH_VERSION ~= 2 then
-			return
-		end
-		for i=1, UIDROPDOWNMENU_MAXLEVELS do
-			for j=1, UIDROPDOWNMENU_MAXBUTTONS do
-				local b = _G["DropDownList" .. i .. "Button" .. j]
-				if not (issecurevariable(b, "value") or b:IsShown()) then
-					b.value = nil
-					repeat
-						j, b["fx" .. j] = j+1
-					until issecurevariable(b, "value")
-				end
-			end
-		end
-	end)
-end
-
-
---[[----------------------------------------------------------------------------
-	=== UIDropDownMenu displayMode taints dropdown initialization
-	https://www.townlong-yak.com/bugs/Kjq4hm-DisplayModeTaint
-
-	If a tainted dropdown menu using the MENU displayMode is open, calling
-	UIDropDownMenu_Initialize will taint the current execution path.
-
-	If this occurs when the Communities UI is loaded, the player will not be
-	able to leave communities or create new community chat channels.
-
-	Affected versions: 8.0.1.26949, 8.1.0.29297 (unfixed).
-----------------------------------------------------------------------------]]--
-if (UIDROPDOWNMENU_OPEN_PATCH_VERSION or 0) < 1 then
-	UIDROPDOWNMENU_OPEN_PATCH_VERSION = 1
-	hooksecurefunc("UIDropDownMenu_InitializeHelper", function(frame)
-		if UIDROPDOWNMENU_OPEN_PATCH_VERSION ~= 1 then
-			return
-		end
-		if UIDROPDOWNMENU_OPEN_MENU and UIDROPDOWNMENU_OPEN_MENU ~= frame
-		   and not issecurevariable(UIDROPDOWNMENU_OPEN_MENU, "displayMode") then
-			UIDROPDOWNMENU_OPEN_MENU = nil
-			local t, f, prefix, i = _G, issecurevariable, " \0", 1
-			repeat
-				i, t[prefix .. i] = i + 1
-			until f("UIDROPDOWNMENU_OPEN_MENU")
-		end
-	end)
-end
-
---[[----------------------------------------------------------------------------
-	=== UIDropDownMenu_SetSelectedValue/_Refresh can taint execution
-	https://www.townlong-yak.com/bugs/YhgQma-SetValueRefreshTaint
-
-	Calling UIDropDownMenu_Refresh (for example by calling
-	UIDropDownMenu_SetSelectedValue) will taint the execution if the most
-	recently initialized/opened dropdown was insecure.
-
-	When Communities UI reopens, UIDropDownMenu_​SetSelectedValue is called
-	without initialising a dropdown. Tainting the execution at this point will
-	cause some community UI widget properties to be tained, preventing the
-	player from performing protected actions such as leaving communities or
-	assigning player notes later.
-
-	Affected versions: 8.1.0.29297 (unfixed).
-----------------------------------------------------------------------------]]--
-if (COMMUNITY_UIDD_REFRESH_PATCH_VERSION or 0) < 1 then
-	COMMUNITY_UIDD_REFRESH_PATCH_VERSION = 1
-	local function CleanDropdowns()
-		if COMMUNITY_UIDD_REFRESH_PATCH_VERSION ~= 1 then
-			return
-		end
-		local f, f2 = FriendsFrame, FriendsTabHeader
-		local s = f:IsShown()
-		f:Hide()
-		f:Show()
-		if not f2:IsShown() then
-			f2:Show()
-			f2:Hide()
-		end
-		if not s then
-			f:Hide()
-		end
-	end
-	hooksecurefunc("Communities_LoadUI", CleanDropdowns)
-	hooksecurefunc("SetCVar", function(n)
-		if n == "lastSelectedClubId" then
-			CleanDropdowns()
-		end
-	end)
-end
-
---[[----------------------------------------------------------------------------
-	=== UIDropDownMenu_Refresh accesses uninitialized buttons
-	https://www.townlong-yak.com/bugs/Mx7CWN-RefreshOverread
-
-	UIDropDownMenu_Refresh, called by UIDropDownMenu_SetSelected*, accesses
-	buttons beyond those present and initialized by the current dropdown. If
-	the previously-open dropdown was insecure and used specific info keys, this
-	will taint the current execution.
-
-	UIDropDownMenu_SetSelected* is widely used on secure execution paths.
-	Blizzard_CUFProfiles is one example of this, causing errors when the
-	Interface Options frame is closed while in combat lockdown.
-
-	Affected versions: 8.2.5.32144 (unfixed).
-----------------------------------------------------------------------------]]--
-if (UIDD_REFRESH_OVERREAD_PATCH_VERSION or 0) < 1 then
-	UIDD_REFRESH_OVERREAD_PATCH_VERSION = 1
-	local function drop(t, k)
-		local c = 42
-		t[k] = nil
-		while not issecurevariable(t, k) do
-			if t[c] == nil then
-				t[c] = nil
-			end
-			c = c + 1
-		end
-	end
-	hooksecurefunc("UIDropDownMenu_InitializeHelper", function()
-		if UIDD_REFRESH_OVERREAD_PATCH_VERSION ~= 1 then
-			return
-		end
-		for i=1,UIDROPDOWNMENU_MAXLEVELS do
-			for j=1,UIDROPDOWNMENU_MAXBUTTONS do
-				local b, _ = _G["DropDownList" .. i .. "Button" .. j]
-				_ = issecurevariable(b, "checked")      or drop(b, "checked")
-				_ = issecurevariable(b, "notCheckable") or drop(b, "notCheckable")
-			end
-		end
-	end)
-end
+--
+-- Replaced by TaintLess
+-- https://www.townlong-yak.com/addons/taintless
