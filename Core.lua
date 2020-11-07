@@ -198,6 +198,8 @@ end
 
 local function _hideBlizzardTabs(self) -- Hide Blizzard's own tabs
 	local CommunitiesFrame = _G.CommunitiesFrame
+	if not CommunitiesFrame then return end
+
 	for _, key in ipairs(communitiesTabs) do
 		CommunitiesFrame[key]:Hide()
 	end
