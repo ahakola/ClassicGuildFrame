@@ -1,5 +1,7 @@
 # Classic Guild Frame
 
+![Release](https://github.com/ahakola/ClassicGuildFrame/actions/workflows/release.yml/badge.svg)
+
 Restores the look and functionality of the old GuildUI by changing the look of the new CommunitiesUI with the added bonus of the `Chat`.
 
 * Looks should be pretty close to the original GuildUI. Few minor changes and different element sizes here and there.
