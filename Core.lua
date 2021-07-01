@@ -13,6 +13,7 @@
 local ADDON_NAME, _ = ...
 local _G = _G
 
+local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
 local L = {}
 do -- Translations
 	local LOCALE = GetLocale()
@@ -557,7 +558,7 @@ do -- Blizzard Options
 				for i, show in ipairs(cfg.show) do
 					if show then
 						cfg.defaultTab = i
-						L_UIDropDownMenu_SetSelectedValue(_G[ADDON_NAME.."OptionsDefaultDropDown"], cfg.defaultTab)
+						LibDD:UIDropDownMenu_SetSelectedValue(_G[ADDON_NAME.."OptionsDefaultDropDown"], cfg.defaultTab)
 						_TabClick(classicTabFrame.Tabs[i])
 						break
 					end
@@ -571,7 +572,7 @@ do -- Blizzard Options
 		local function DefaultDropDownOnClick(button)
 			if cfg.show[button.value] then
 				cfg.defaultTab = button.value
-				L_UIDropDownMenu_SetSelectedValue(_G[ADDON_NAME.."OptionsDefaultDropDown"], cfg.defaultTab)
+				LibDD:UIDropDownMenu_SetSelectedValue(_G[ADDON_NAME.."OptionsDefaultDropDown"], cfg.defaultTab)
 				DWarningText:Hide()
 				_TabClick(classicTabFrame.Tabs[button.value])
 			else
@@ -579,14 +580,14 @@ do -- Blizzard Options
 			end
 		end
 		local function DefaultDropDown_Initialize()
-			local info = L_UIDropDownMenu_CreateInfo()
+			local info = LibDD:UIDropDownMenu_CreateInfo()
 
 			for i, name in ipairs(tabNames) do
 				info.text = name
 				info.value = i
 				info.checked = i == cfg.defaultTab
 				info.func = DefaultDropDownOnClick
-				L_UIDropDownMenu_AddButton(info)
+				LibDD:UIDropDownMenu_AddButton(info)
 			end
 		end
 		local function _TestTabUpdate()
@@ -611,18 +612,18 @@ do -- Blizzard Options
 		end
 		local function HighlightDropDownOnClick(button)
 			cfg.highlightStyle = button.value
-			L_UIDropDownMenu_SetSelectedValue(_G[ADDON_NAME.."OptionsHighlightDropDown"], cfg.highlightStyle)
+			LibDD:UIDropDownMenu_SetSelectedValue(_G[ADDON_NAME.."OptionsHighlightDropDown"], cfg.highlightStyle)
 			_TestTabUpdate()
 		end
 		local function HighlightDropDown_Initialize()
-			local info = L_UIDropDownMenu_CreateInfo()
+			local info = LibDD:UIDropDownMenu_CreateInfo()
 
 			for i, data in ipairs(highlightStyles) do
 				info.text = data.name
 				info.value = i
 				info.checked = i == cfg.highlightStyle
 				info.func = HighlightDropDownOnClick
-				L_UIDropDownMenu_AddButton(info)
+				LibDD:UIDropDownMenu_AddButton(info)
 			end
 		end
 
@@ -661,10 +662,10 @@ do -- Blizzard Options
 		DefaultDropDownText:SetText(L.defaultTab)
 
 		--DefaultDropDown = CreateFrame("Button", "$parentDefaultDropDown", self, "L_UIDropDownMenuTemplate")
-		DefaultDropDown = L_Create_UIDropDownMenu(self:GetName().."DefaultDropDown", self) -- https://www.curseforge.com/wow/addons/libuidropdownmenu/pages/faq/changes-regarding-to-dropdown-templates-usage
-		L_UIDropDownMenu_Initialize(DefaultDropDown, DefaultDropDown_Initialize)
-		L_UIDropDownMenu_SetSelectedValue(DefaultDropDown, cfg.defaultTab)
-		L_UIDropDownMenu_JustifyText(DefaultDropDown, "CENTER")
+		DefaultDropDown = LibDD:Create_UIDropDownMenu(self:GetName().."DefaultDropDown", self) -- https://www.curseforge.com/wow/addons/libuidropdownmenu/pages/faq/changes-regarding-to-dropdown-templates-usage
+		LibDD:UIDropDownMenu_Initialize(DefaultDropDown, DefaultDropDown_Initialize)
+		LibDD:UIDropDownMenu_SetSelectedValue(DefaultDropDown, cfg.defaultTab)
+		LibDD:UIDropDownMenu_JustifyText(DefaultDropDown, "CENTER")
 		DefaultDropDown:SetPoint("TOPLEFT", DefaultDropDownText, "BOTTOMLEFT", 10, -12)
 
 		DWarningText = self:CreateFontString("$parentCWarningText", "ARTWORK", "GameFontNormalSmall")
@@ -729,10 +730,10 @@ do -- Blizzard Options
 		HighlightDropDownText:SetText(L.highlightStyle)
 
 		--HighlightDropDown = CreateFrame("Button", "$parentHighlightDropDown", self, "L_UIDropDownMenuTemplate")
-		HighlightDropDown = L_Create_UIDropDownMenu(self:GetName().."HighlightDropDown", self) -- https://www.curseforge.com/wow/addons/libuidropdownmenu/pages/faq/changes-regarding-to-dropdown-templates-usage
-		L_UIDropDownMenu_Initialize(HighlightDropDown, HighlightDropDown_Initialize)
-		L_UIDropDownMenu_SetSelectedValue(HighlightDropDown, cfg.highlightStyle)
-		L_UIDropDownMenu_JustifyText(HighlightDropDown, "CENTER")
+		HighlightDropDown = LibDD:Create_UIDropDownMenu(self:GetName().."HighlightDropDown", self) -- https://www.curseforge.com/wow/addons/libuidropdownmenu/pages/faq/changes-regarding-to-dropdown-templates-usage
+		LibDD:UIDropDownMenu_Initialize(HighlightDropDown, HighlightDropDown_Initialize)
+		LibDD:UIDropDownMenu_SetSelectedValue(HighlightDropDown, cfg.highlightStyle)
+		LibDD:UIDropDownMenu_JustifyText(HighlightDropDown, "CENTER")
 		HighlightDropDown:SetPoint("TOPLEFT", HighlightDropDownText, "BOTTOMLEFT", 10, -12)
 
 		HighlightTestTab = CreateFrame("Button", "$parentHighlightTestTab", self, "CharacterFrameTabButtonTemplate")
