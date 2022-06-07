@@ -1,9 +1,9 @@
-## Interface: 90200
+## Interface: 90205
 ## Author: Sanex (Arathor EU)
 ## Title: Classic Guild Frame
 ## Version: @project-version@
 ## Notes: Restoring the old GuildUI for BfA and later with the Chat from the new CommunitiesUI
-## Dependencies: LibStub, !LibUIDropDownMenu
+## OptionalDeps: LibStub, LibUIDropDownMenu
 ## SavedVariables: ClassicGuildFrameConfig
 
 TaintLess.xml
