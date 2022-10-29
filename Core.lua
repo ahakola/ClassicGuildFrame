@@ -306,7 +306,7 @@ local function _createClassicTabs() -- Create new tabs for Classic Guild Frame
 	classicTabFrame.Tabs = classicTabFrame.Tabs or {}
 	if #classicTabFrame.Tabs >= 6 then return end -- Buttons already crated
 	for i = 1, 6 do
-		local tab = CreateFrame("Button", "ClassicTab"..i, classicTabFrame, "CharacterFrameTabButtonTemplate", i)
+		local tab = CreateFrame("Button", "ClassicTab"..i, classicTabFrame, "MinimalTabTemplate", i)
 		if i == 1 then
 			tab:SetPoint("BOTTOMLEFT", 0, -20)
 
@@ -736,11 +736,10 @@ do -- Blizzard Options
 		LibDD:UIDropDownMenu_JustifyText(HighlightDropDown, "CENTER")
 		HighlightDropDown:SetPoint("TOPLEFT", HighlightDropDownText, "BOTTOMLEFT", 10, -12)
 
-		HighlightTestTab = CreateFrame("Button", "$parentHighlightTestTab", self, "CharacterFrameTabButtonTemplate")
+		HighlightTestTab = CreateFrame("Frame", "$parentHighlightTestTab", self, "TabSystemTemplate")
 		HighlightTestTab:SetPoint("TOP", HighlightDropDown)
-		HighlightTestTab:SetText(tabNames[1])
-		PanelTemplates_DeselectTab(HighlightTestTab)
-		PanelTemplates_TabResize(HighlightTestTab, 0)
+		HighlightTestTab:AddTab(tabNames[1])
+		HighlightTestTab.tabs[1]:Disable()
 		HighlightTestTab:SetPoint("LEFT", floor(self:GetWidth()/2 - HighlightTestTab:GetWidth()/2), 0)
 
 		local t = HighlightTestTab:CreateTexture("$parentHighlightGlow", "ARTWORK")
