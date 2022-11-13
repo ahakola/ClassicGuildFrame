@@ -129,8 +129,7 @@ f:SetScript("OnEvent", function(self, event, ...)
 end)
 f:RegisterEvent("ADDON_LOADED")
 
-local classicTabFrame = CreateFrame("Frame", ADDON_NAME.."Tabs", UIParent)
-classicTabFrame:SetSize(10, 10)
+local classicTabFrame = CreateFrame("Frame", ADDON_NAME.."Tabs", UIParent, "TabSystemTemplate")
 
 local function initDB(db, defaults) -- This function copies values from one table into another:
 	if type(db) ~= "table" then db = {} end
@@ -146,7 +145,7 @@ local function initDB(db, defaults) -- This function copies values from one tabl
 end
 
 local function _stopFlashing() -- If flashing, stop flashing
-	local glow = classicTabFrame.Tabs[1].Glow
+	local glow = classicTabFrame.tabs[1].Glow
 	if UIFrameIsFlashing(glow) then
 		UIFrameFlashStop(glow)
 	end
@@ -165,8 +164,8 @@ end
 
 local function _checkUnreadMessages(calledFrom) -- UIFrameFlash the Glow-texture (other option was SetButtonPulse() on the tab)
 	if not cfg.show[1] then return end -- Chat tab is hidden
-	local unreadMessages = _G.CommunitiesUtil.DoesAnyCommunityHaveUnreadMessages() or HasUnseenInvitations()
-	local glow = classicTabFrame.Tabs[1].Glow
+	local unreadMessages = _G.CommunitiesUtil.DoesAnyCommunityHaveUnreadMessages() --or HasUnseenInvitations()
+	local glow = classicTabFrame.tabs[1].Glow
 
 	if cfg.highlightStyle > #highlightStyles then
 		cfg.highlightStyle = defaultStyle
@@ -190,13 +189,6 @@ local function _checkUnreadMessages(calledFrom) -- UIFrameFlash the Glow-texture
 	end
 end
 
-local function _TabShow(self, ...) -- Resize tabs on show
-	PanelTemplates_TabResize(self, -7)
-	--local oldWidth = self:GetWidth()
-	--self:SetWidth(oldWidth - 4) -- Tighten the tabs a bit to make sure they all fit under the frame
-	--print("Tab width:", tostring(oldWidth), tostring(self:GetWidth()))
-end
-
 local function _hideBlizzardTabs(self) -- Hide Blizzard's own tabs
 	local CommunitiesFrame = _G.CommunitiesFrame
 	if not CommunitiesFrame then return end
@@ -207,7 +199,7 @@ local function _hideBlizzardTabs(self) -- Hide Blizzard's own tabs
 
 	if self then
 		classicTabFrame:SetParent(self)
-		classicTabFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+		classicTabFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, 2)
 		classicTabFrame:Show()
 	end
 end
@@ -219,9 +211,8 @@ local function _TabClick(self, ...) -- Handle Tab clicks
 		CommunitiesFrame Frame: 608
 		CommunitiesFrame CList: 171
 	]]--
-	local tabIndex = self:GetID()
-	PanelTemplates_SetTab(classicTabFrame, tabIndex)
-	PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB)
+	local tabIndex = type(self) == "number" and self or self:GetID()
+	classicTabFrame:SetTabVisuallySelected(id)
 
 	local CommunitiesFrame = _G.CommunitiesFrame
 	if not CommunitiesFrame then return end
@@ -303,66 +294,49 @@ local function _TabClick(self, ...) -- Handle Tab clicks
 end
 
 local function _createClassicTabs() -- Create new tabs for Classic Guild Frame
-	classicTabFrame.Tabs = classicTabFrame.Tabs or {}
-	if #classicTabFrame.Tabs >= 6 then return end -- Buttons already crated
+	if classicTabFrame.tabs and #classicTabFrame.tabs > 0 then return end
+	classicTabFrame.minTabWidth = 0
+	classicTabFrame.maxTabWidth = 66
 	for i = 1, 6 do
-		local tab = CreateFrame("Button", "ClassicTab"..i, classicTabFrame, "MinimalTabTemplate", i)
-		if i == 1 then
-			tab:SetPoint("BOTTOMLEFT", 0, -20)
+		local tab = classicTabFrame:AddTab(tabNames[i])
 
-			local t = tab:CreateTexture("$parentHighlightGlow", "ARTWORK")
+		if i == 1 then
+			local t = classicTabFrame.tabs[tab]:CreateTexture("$parentHighlightGlow", "ARTWORK")
 			t:SetPoint("TOPLEFT", 12, -2)
 			t:SetPoint("BOTTOMRIGHT", -12, 7)
 			t:SetBlendMode("ADD")
 			t:Hide()
-			tab.Glow = t
-		else
-			tab:SetPoint("LEFT", classicTabFrame.Tabs[i-1], "RIGHT", -15, 0)
+			classicTabFrame.tabs[tab].Glow = t
 		end
-		tab:SetText(tabNames[i])
-		tab:SetScript("OnShow", _TabShow)
-		tab:SetScript("OnClick", _TabClick)
-
-		classicTabFrame.Tabs[i] = tab
 	end
-	PanelTemplates_SetNumTabs(classicTabFrame, 6)
+	classicTabFrame:SetTabSelectedCallback(_TabClick)
 	classicTabFrame:Hide()
 end
 
 local function _selectTab()
-	if not IsInGuild() then return end -- Abort if not in a guild, otherwise this breaks Guild Finder...
-
-	if cfg.openAlwaysToDefault or (not PanelTemplates_GetSelectedTab(classicTabFrame)) then -- Always open to Default Tab or no SelectedTab
-		_TabClick(classicTabFrame.Tabs[cfg.defaultTab])
+	if cfg.openAlwaysToDefault or (not classicTabFrame.selectedTabID) then -- Always open to Default Tab or no SelectedTab
+		classicTabFrame:SetTab(cfg.defaultTab)
 	else
-		_TabClick(classicTabFrame.Tabs[PanelTemplates_GetSelectedTab(classicTabFrame)])
+		classicTabFrame:SetTab(classicTabFrame.selectedTabID)
 	end
 end
 
 local function _HandleTabs(self) -- Handle hiding and anchoring Classic Guild Frame tabs
-	local firstTab = false
-	local previousTab = 0
 	local isGuilded = IsInGuild() -- Hide tabs if not in a guild
-	for i, show in ipairs(cfg.show) do
-		if isGuilded and show then
-			classicTabFrame.Tabs[i]:Show()
-			classicTabFrame.Tabs[i]:ClearAllPoints()
-			if not firstTab then
-				firstTab = true
-				classicTabFrame.Tabs[i]:SetPoint("BOTTOMLEFT", 0, -20)
-			else
-				classicTabFrame.Tabs[i]:SetPoint("LEFT", classicTabFrame.Tabs[previousTab], "RIGHT", -15, 0)
-			end
-			previousTab = i
-		else
-			classicTabFrame.Tabs[i]:Hide()
+
+	if isGuilded then
+		classicTabFrame:Show()
+
+		for i, show in ipairs(cfg.show) do
+			classicTabFrame:SetTabShown(i, show)
 		end
+
+		_checkUnreadMessages("_HandleTabs")
+		_hideBlizzardTabs(self)
+		_selectTab()
+	else
+		classicTabFrame:Hide()
 	end
-
-	_checkUnreadMessages("_HandleTabs")
-	_hideBlizzardTabs(self)
-
-	_selectTab()
 end
 
 local setupDone = false
@@ -455,13 +429,11 @@ end
 
 local function _MinimizeHook()
 	--cfg.miniMode = true
-	--_TabClick(classicTabFrame.Tabs[1])
 	_selectTab() -- Return to the last open tab after pressing the MaximizeMinimizeFrame
 end
 
 local function _MaximizeHook()
 	--cfg.miniMode = false
-	--_TabClick(classicTabFrame.Tabs[1])
 	_selectTab() -- Return to the last open tab after pressing the MaximizeMinimizeFrame
 end
 
@@ -559,13 +531,13 @@ do -- Blizzard Options
 					if show then
 						cfg.defaultTab = i
 						LibDD:UIDropDownMenu_SetSelectedValue(_G[ADDON_NAME.."OptionsDefaultDropDown"], cfg.defaultTab)
-						_TabClick(classicTabFrame.Tabs[i])
+						_TabClick(classicTabFrame.tabs[i])
 						break
 					end
 				end
 			end
-			if not cfg.show[PanelTemplates_GetSelectedTab(classicTabFrame)] then
-				_TabClick(classicTabFrame.Tabs[cfg.defaultTab])
+			if not cfg.show[classicTabFrame.selectedTabID] then
+				_TabClick(cfg.defaultTab)
 			end
 			_HandleTabs()
 		end
@@ -574,7 +546,7 @@ do -- Blizzard Options
 				cfg.defaultTab = button.value
 				LibDD:UIDropDownMenu_SetSelectedValue(_G[ADDON_NAME.."OptionsDefaultDropDown"], cfg.defaultTab)
 				DWarningText:Hide()
-				_TabClick(classicTabFrame.Tabs[button.value])
+				_TabClick(classicTabFrame.tabs[button.value])
 			else
 				UIFrameFadeOut(DWarningText, 5, 1, 0)
 			end
@@ -742,7 +714,7 @@ do -- Blizzard Options
 		HighlightTestTab.tabs[1]:Disable()
 		HighlightTestTab:SetPoint("LEFT", floor(self:GetWidth()/2 - HighlightTestTab:GetWidth()/2), 0)
 
-		local t = HighlightTestTab:CreateTexture("$parentHighlightGlow", "ARTWORK")
+		local t = HighlightTestTab.tabs[1]:CreateTexture("$parentHighlightGlow", "ARTWORK")
 		t:SetPoint("TOPLEFT", 12, -2)
 		t:SetPoint("BOTTOMRIGHT", -12, 7)
 		t:SetBlendMode("ADD")
