@@ -450,7 +450,7 @@ function f:ADDON_LOADED(event, addon)
 		self:RegisterEvent("CLUB_INVITATION_REMOVED_FOR_SELF") -- Invitation removed for self
 		self:RegisterEvent("PLAYER_GUILD_UPDATE") -- This appears to be fired when a player is gkicked, gquits, etc.
 
-		if not hooked and IsAddOnLoaded("Blizzard_Communities") and _G.CommunitiesFrame then
+		if not hooked and C_AddOns.IsAddOnLoaded("Blizzard_Communities") and _G.CommunitiesFrame then
 			_G.CommunitiesFrame:HookScript("OnShow", _HandleTabs)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Minimize", _MinimizeHook)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Maximize", _MaximizeHook)
@@ -460,7 +460,7 @@ function f:ADDON_LOADED(event, addon)
 			self:UnregisterEvent(event)
 		end
 	elseif addon == "Blizzard_Communities" then
-		if not hooked and IsAddOnLoaded(ADDON_NAME) then
+		if not hooked and C_AddOns.IsAddOnLoaded(ADDON_NAME) then
 			_G.CommunitiesFrame:HookScript("OnShow", _HandleTabs)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Minimize", _MinimizeHook)
 			hooksecurefunc(_G.CommunitiesFrame.MaximizeMinimizeFrame, "Maximize", _MaximizeHook)
