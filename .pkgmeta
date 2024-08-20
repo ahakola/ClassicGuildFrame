@@ -9,6 +9,9 @@ externals:
     LibUIDropDownMenu:
         url: https://repos.wowace.com/wow/libuidropdownmenu/trunk/LibUIDropDownMenu
         tag: latest
+    TaintLess:
+        url: https://www.townlong-yak.com/addons.git/taintless
+        commit: default
 
 enable-nolib-creation: no
 

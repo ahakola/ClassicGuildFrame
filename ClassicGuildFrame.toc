@@ -6,7 +6,7 @@
 ## OptionalDeps: LibStub, LibUIDropDownMenu
 ## SavedVariables: ClassicGuildFrameConfig
 
-TaintLess.xml
+TaintLess\TaintLess.xml
 LibStub\LibStub.lua
 LibUIDropDownMenu\LibUIDropDownMenu.xml
 
