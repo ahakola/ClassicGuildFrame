@@ -497,7 +497,9 @@ end
 do -- Blizzard Options
 	local Options = CreateFrame("Frame", ADDON_NAME.."Options", InterfaceOptionsFramePanelContainer)
 	Options.name = ADDON_NAME
-	InterfaceOptions_AddCategory(Options)
+	--InterfaceOptions_AddCategory(Options)
+	local category = Settings.RegisterCanvasLayoutCategory(Options, ADDON_NAME)
+	Settings.RegisterAddOnCategory(category)
 
 	Options:Hide()
 	Options:SetScript("OnShow", function(self)
