@@ -1,4 +1,4 @@
-## Interface: 120007
+## Interface: 120100
 ## Author: Sanex (Arathor EU)
 ## Title: Classic Guild Frame
 ## Version: @project-version@
